@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { Avatar, Stack, Button, Center, Container, Table, Thead, Tbody, Tr, Th, Td, TableContainer, Card, CardBody, Heading, Box, VStack } from '@chakra-ui/react'
-import { GoTrash, GoPencil, GoArrowRight, GoArrowLeft } from "react-icons/go";
+import { Avatar, Badge, Stack, Button, Center, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverHeader, PopoverBody, Table, Thead, IconButton, Tbody, Tr, Th, Td, TableContainer, Card, CardBody, Heading } from '@chakra-ui/react'
+import { GoTrash, GoPencil, GoHeart } from "react-icons/go";
 
 import client from '../config/apolloClient';
 import { GetContactList } from '../config/queries';
@@ -12,7 +12,7 @@ const ContactList = (props: Props) => {
 
     const [contacts, setContacts] = useState<Contact[]>([]);
     const [currentPage, setCurrentPage] = useState<number>(1);
-    const pageSize = 5; // Number of rows per page
+    const pageSize = 10; // Number of rows per page
 
     const getContacts = async () => {
         const { data } = await client.query({
@@ -35,7 +35,7 @@ const ContactList = (props: Props) => {
 
     return (
         <div>
-            <Heading mb={10} mt={20} textAlign={'center'}>Contact List</Heading>
+            <Heading mb={10} mt={10} textAlign={'center'}>Contact List</Heading>
             <Center>
                 <Card>
                     <CardBody>
@@ -45,8 +45,8 @@ const ContactList = (props: Props) => {
                                     <Tr>
                                         <Th>Profile</Th>
                                         <Th>Name</Th>
-                                        <Th>Phone</Th>
-                                        <Th>Actions</Th>
+                                        <Th>Phone Numbers</Th>
+                                        <Th textAlign={'center'}>Actions</Th>
                                     </Tr>
                                 </Thead>
                                 <Tbody>
@@ -57,22 +57,58 @@ const ContactList = (props: Props) => {
 
                                             <Td>{contact.first_name} {contact.last_name}</Td>
 
+                                            {/* <Td>{contact.phones && contact.phones.length > 0 ? contact.phones[0].number : 'No phone number'}</Td> */}
+
+                                            {/* <Td>
+                                                {contact.phones && contact.phones.length > 0 ? (
+                                                    <>
+                                                        {contact.phones[0].number}
+                                                        {contact.phones.length > 1 && (
+                                                            <Badge ml={2} variant='subtle' colorScheme='green'>
+                                                                +{contact.phones.length - 1}
+                                                            </Badge>
+                                                        )}
+                                                    </>
+                                                ) : (
+                                                    'No phone number'
+                                                )}
+                                            </Td> */}
+
                                             <Td>
                                                 {contact.phones && contact.phones.length > 0 ? (
-                                                    <VStack justify={'end'}>
-                                                        {contact.phones.map((phone, index) => (
-                                                            <p key={index}>{phone.number}</p>
-                                                        ))}
-                                                    </VStack>
+                                                    <Popover trigger='hover'>
+                                                        <PopoverTrigger>
+                                                            <span>
+                                                                {contact.phones[0].number}
+                                                                {contact.phones.length > 1 && (
+                                                                    <Badge ml={2} variant='subtle' colorScheme='green'>
+                                                                        +{contact.phones.length - 1}
+                                                                    </Badge>
+                                                                )}
+                                                            </span>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent>
+                                                            <PopoverHeader fontWeight='semibold'>Other Numbers</PopoverHeader>
+                                                            <PopoverArrow />
+                                                            <PopoverBody>
+                                                                {contact.phones.slice(1).map((phone, index) => (
+                                                                    <div key={index}>{phone.number}</div>
+                                                                ))}
+                                                            </PopoverBody>
+                                                        </PopoverContent>
+                                                    </Popover>
                                                 ) : (
-                                                    <p>No phone number</p>
+                                                    'No phone number'
                                                 )}
                                             </Td>
 
                                             <Td>
                                                 <Stack direction='row' spacing={4}>
-                                                    <Button size={'sm'} leftIcon={<GoTrash />} colorScheme='red' variant='solid'>Delete</Button>
-                                                    <Button size={'sm'} rightIcon={<GoPencil />} colorScheme='blue' variant='outline'>Edit</Button>
+                                                    <IconButton variant='ghost' colorScheme='pink' aria-label='Add to favorites' icon={<GoHeart />} />
+                                                    <IconButton variant='outline' colorScheme='blue' aria-label='Edit contact' icon={<GoPencil />} />
+                                                    <IconButton variant='solid' colorScheme='red' aria-label='Delete contact' icon={<GoTrash />} />
+                                                    {/* <Button size={'sm'} leftIcon={<GoTrash />} colorScheme='red' variant='solid'>Delete</Button> */}
+                                                    {/* <Button size={'sm'} rightIcon={<GoPencil />} colorScheme='blue' variant='outline'>Edit</Button> */}
                                                 </Stack>
                                             </Td>
 
