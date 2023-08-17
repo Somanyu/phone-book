@@ -1,15 +1,14 @@
-import { Input, Button, FormLabel, FormErrorMessage, useDisclosure, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Grid, GridItem, FormControl } from '@chakra-ui/react'
-import { GoPersonAdd } from "react-icons/go";
+import { Input, Button, FormLabel, FormErrorMessage, Heading, Spacer, IconButton, Grid, GridItem, FormControl, Center, Card, CardBody, Flex } from '@chakra-ui/react'
+import { GoPersonAdd, GoTriangleLeft, GoCheck, GoPlus } from "react-icons/go";
 import PhoneInput from 'react-phone-input-2';
-import { Field, Form, Formik } from 'formik';
+import { Field, Form, Formik, FieldArray  } from 'formik';
 
 import 'react-phone-input-2/lib/style.css';
+import { Link } from 'react-router-dom';
 
 type Props = {}
 
-const AddContactModal = (props: Props) => {
-
-    const { isOpen, onOpen, onClose } = useDisclosure();
+const AddContact = (props: Props) => {
 
     const validateFirstName = (value: string) => {
         let error: string | undefined;
@@ -52,14 +51,10 @@ const AddContactModal = (props: Props) => {
 
     return (
         <div>
-            <Button onClick={onOpen} size={'sm'} ml={'3'} leftIcon={<GoPersonAdd />} colorScheme='whatsapp' variant='solid'>Add contact</Button>
-
-            <Modal isOpen={isOpen} onClose={onClose}>
-                <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>Add a contact</ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody>
+            <Heading mb={10} mt={10} textAlign={'center'}><IconButton variant={'outline'} aria-label='Add contact' icon={<GoPersonAdd />} /> Add Contact</Heading>
+            <Center>
+                <Card>
+                    <CardBody>
                         <Formik
                             initialValues={{ first_name: '', last_name: '', phoneNumber: '' }}
                             onSubmit={(values) => {
@@ -95,6 +90,7 @@ const AddContactModal = (props: Props) => {
                                     </Grid>
 
                                     <Grid templateColumns='repeat(5, 1fr)' gap={4}>
+
                                         <GridItem colSpan={5}>
                                             <Field name='phoneNumber' validate={validatePhone}>
                                                 {({ field, form }: any) => (
@@ -125,20 +121,31 @@ const AddContactModal = (props: Props) => {
                                                     </FormControl>
                                                 )}
                                             </Field>
+                                            <Button mt={3} leftIcon={<GoPlus/>} colorScheme='green' size='xs'>
+                                                Add another number
+                                            </Button>
                                         </GridItem>
 
                                     </Grid>
-                                    <Button type='submit' colorScheme='blue' mt={5}>
-                                        Save
-                                    </Button>
+                                    <Flex mt={10}>
+                                        <Link to='/'>
+                                            <Button leftIcon={<GoTriangleLeft />} colorScheme='red' variant='ghost'>
+                                                Contact list
+                                            </Button>
+                                        </Link>
+                                        <Spacer />
+                                        <Button leftIcon={<GoCheck />} type='submit' colorScheme='whatsapp' >
+                                            Save
+                                        </Button>
+                                    </Flex>
                                 </Form>
                             )}
                         </Formik>
-                    </ModalBody>
-                </ModalContent>
-            </Modal>
+                    </CardBody>
+                </Card>
+            </Center>
         </div>
     )
 }
 
-export default AddContactModal
+export default AddContact

@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from 'react'
-import { Avatar, Badge, Stack, Button, Center, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverHeader, PopoverBody, Table, Thead, IconButton, Tbody, Tr, Th, Td, TableContainer, Card, CardBody, Heading, HStack } from '@chakra-ui/react'
-import { GoTrash, GoPencil, GoHeart } from "react-icons/go";
+import { Link } from 'react-router-dom';
+import { Avatar, Badge, Stack, Button, Center, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverHeader, PopoverBody, Table, Thead, IconButton, Tbody, Tr, Th, Td, TableContainer, Card, CardBody, Heading, HStack, useDisclosure, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from '@chakra-ui/react'
+import { GoTrash, GoPencil, GoHeart, GoPersonAdd } from "react-icons/go";
 
 // Config files
 import client from '../config/apolloClient';
 import { GetContactList } from '../config/queries';
 import { Contact } from '../config/types';
 
-// Components
-import AddContactModal from './AddContactModal';
-
 type Props = {}
 
 const ContactList = (props: Props) => {
 
+    const [selectedContactId, setSelectedContactId] = useState<number | null>(null);
     const [contacts, setContacts] = useState<Contact[]>([]);
     const [currentPage, setCurrentPage] = useState<number>(1);
+    const { isOpen, onOpen, onClose } = useDisclosure();
+
     const pageSize = 10; // Number of rows per page
 
     const getContacts = async () => {
@@ -37,12 +38,21 @@ const ContactList = (props: Props) => {
         setCurrentPage(newPage);
     };
 
+    const onOpenModal = (contactId: number) => {
+        setSelectedContactId(contactId);
+        onOpen();
+    };
+
     return (
         <div>
             <HStack mb={10} mt={'10'} justify={'center'}>
                 <Heading textAlign={'center'}>Contact List</Heading>
-                <AddContactModal />
-                {/* <Button onClick={onOpen} size={'sm'} ml={'3'} leftIcon={<GoPersonAdd />} colorScheme='whatsapp' variant='solid'>Add contact</Button> */}
+                {/* <AddContactModal /> */}
+                <Link to='/add/contact'>
+                    <Button size={'sm'} ml={'3'} leftIcon={<GoPersonAdd />} colorScheme='whatsapp' variant='solid'>
+                        Add Contact
+                    </Button>
+                </Link>
             </HStack>
 
             <Center>
@@ -98,11 +108,38 @@ const ContactList = (props: Props) => {
                                                 <Stack direction='row' spacing={4}>
                                                     <IconButton variant='ghost' colorScheme='pink' aria-label='Add to favorites' icon={<GoHeart />} />
                                                     <IconButton variant='outline' colorScheme='blue' aria-label='Edit contact' icon={<GoPencil />} />
-                                                    <IconButton variant='solid' colorScheme='red' aria-label='Delete contact' icon={<GoTrash />} />
-                                                    {/* <Button size={'sm'} leftIcon={<GoTrash />} colorScheme='red' variant='solid'>Delete</Button> */}
-                                                    {/* <Button size={'sm'} rightIcon={<GoPencil />} colorScheme='blue' variant='outline'>Edit</Button> */}
+                                                    <IconButton onClick={() => onOpenModal(contact.id)} variant='solid' colorScheme='red' aria-label='Delete contact' icon={<GoTrash />} />
                                                 </Stack>
                                             </Td>
+
+                                            <Modal isOpen={isOpen} onClose={onClose}>
+                                                <ModalOverlay />
+                                                <ModalContent>
+                                                    <ModalHeader></ModalHeader>
+                                                    <ModalCloseButton />
+                                                    <ModalBody>
+                                                        {selectedContactId !== null &&
+                                                            contacts.map((contact) => {
+                                                                if (contact.id === selectedContactId) {
+                                                                    return (
+                                                                        <div key={contact.id}>
+                                                                            <Heading as='h4' size='md' mb={4}>
+                                                                                Delete contact for {contact.first_name} {contact.last_name} ?
+                                                                            </Heading>
+                                                                            <div>
+                                                                                <Button leftIcon={<GoTrash />} colorScheme='red' variant='solid'>
+                                                                                    Yes, delete
+                                                                                </Button>
+                                                                            </div>
+                                                                        </div>
+                                                                    );
+                                                                }
+                                                                return null;
+                                                            })}
+                                                    </ModalBody>
+                                                    <ModalFooter></ModalFooter>
+                                                </ModalContent>
+                                            </Modal>
 
                                         </Tr>
                                     ))}
