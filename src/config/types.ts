@@ -3,6 +3,7 @@ export interface Phones {
 }
 
 export interface Contact {
+  isFavorite: unknown;
   created_at: string;
   first_name: string;
   id: number;
@@ -19,4 +20,8 @@ export type Inputs = {
   first_name?: string | undefined;
   last_name?: string | undefined;
   phones?: Number[];
+};
+
+export type FavoriteContact = Contact & {
+  isFavorite: boolean;
 };
