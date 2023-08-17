@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react'
-import { Avatar, Badge, Stack, Button, Center, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverHeader, PopoverBody, Table, Thead, IconButton, Tbody, Tr, Th, Td, TableContainer, Card, CardBody, Heading } from '@chakra-ui/react'
+import { Avatar, Badge, Stack, Button, Center, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverHeader, PopoverBody, Table, Thead, IconButton, Tbody, Tr, Th, Td, TableContainer, Card, CardBody, Heading, HStack } from '@chakra-ui/react'
 import { GoTrash, GoPencil, GoHeart } from "react-icons/go";
 
+// Config files
 import client from '../config/apolloClient';
 import { GetContactList } from '../config/queries';
 import { Contact } from '../config/types';
+
+// Components
+import AddContactModal from './AddContactModal';
 
 type Props = {}
 
@@ -35,7 +39,12 @@ const ContactList = (props: Props) => {
 
     return (
         <div>
-            <Heading mb={10} mt={10} textAlign={'center'}>Contact List</Heading>
+            <HStack mb={10} mt={'10'} justify={'center'}>
+                <Heading textAlign={'center'}>Contact List</Heading>
+                <AddContactModal />
+                {/* <Button onClick={onOpen} size={'sm'} ml={'3'} leftIcon={<GoPersonAdd />} colorScheme='whatsapp' variant='solid'>Add contact</Button> */}
+            </HStack>
+
             <Center>
                 <Card>
                     <CardBody>
@@ -56,23 +65,6 @@ const ContactList = (props: Props) => {
                                             <Td><Avatar name={`${contact.first_name} ${contact.last_name}`} src={`https://api.dicebear.com/6.x/lorelei/svg?seed=${contact.first_name}`} /></Td>
 
                                             <Td>{contact.first_name} {contact.last_name}</Td>
-
-                                            {/* <Td>{contact.phones && contact.phones.length > 0 ? contact.phones[0].number : 'No phone number'}</Td> */}
-
-                                            {/* <Td>
-                                                {contact.phones && contact.phones.length > 0 ? (
-                                                    <>
-                                                        {contact.phones[0].number}
-                                                        {contact.phones.length > 1 && (
-                                                            <Badge ml={2} variant='subtle' colorScheme='green'>
-                                                                +{contact.phones.length - 1}
-                                                            </Badge>
-                                                        )}
-                                                    </>
-                                                ) : (
-                                                    'No phone number'
-                                                )}
-                                            </Td> */}
 
                                             <Td>
                                                 {contact.phones && contact.phones.length > 0 ? (
