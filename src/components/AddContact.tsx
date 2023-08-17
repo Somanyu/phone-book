@@ -1,7 +1,7 @@
-import { Input, Button, FormLabel, FormErrorMessage, Heading, Spacer, IconButton, Grid, GridItem, FormControl, Center, Card, CardBody, Flex } from '@chakra-ui/react'
-import { GoPersonAdd, GoTriangleLeft, GoCheck, GoPlus } from "react-icons/go";
+import { Input, Button, FormLabel, FormErrorMessage, Heading, Spacer, IconButton, Grid, HStack, GridItem, FormControl, Center, Card, CardBody, Flex, VStack, SimpleGrid } from '@chakra-ui/react'
+import { GoPersonAdd, GoX, GoTriangleLeft, GoCheck, GoPlus } from "react-icons/go";
 import PhoneInput from 'react-phone-input-2';
-import { Field, Form, Formik, FieldArray  } from 'formik';
+import { Field, Form, Formik, FieldArray } from 'formik';
 
 import 'react-phone-input-2/lib/style.css';
 import { Link } from 'react-router-dom';
@@ -56,13 +56,13 @@ const AddContact = (props: Props) => {
                 <Card>
                     <CardBody>
                         <Formik
-                            initialValues={{ first_name: '', last_name: '', phoneNumber: '' }}
+                            initialValues={{ first_name: '', last_name: '', phoneNumbers: [''] }}
                             onSubmit={(values) => {
                                 // Handle form submission
                                 console.log(values);
                             }}
                         >
-                            {(props) => (
+                            {({ values, handleSubmit, setFieldValue }) => (
                                 <Form>
                                     <Grid templateColumns='repeat(2, 1fr)' gap={4} mb={3}>
                                         <GridItem>
@@ -90,41 +90,67 @@ const AddContact = (props: Props) => {
                                     </Grid>
 
                                     <Grid templateColumns='repeat(5, 1fr)' gap={4}>
+                                        <FieldArray name="phoneNumbers">
+                                            {({ push, remove }: any) => (
+                                                <GridItem colSpan={3}>
+                                                    <FormLabel>Phone number</FormLabel>
+                                                    {values.phoneNumbers.map((phoneNumber: any, index: any) => (
+                                                        <div key={index}>
+                                                            <Field
+                                                                name={`phoneNumbers.${index}`}
+                                                                validate={validatePhone}
+                                                            >
+                                                                {({ field, form }: any) => (
+                                                                    <FormControl
+                                                                        isInvalid={
+                                                                            form.errors.phoneNumbers?.[index] &&
+                                                                            form.touched.phoneNumbers?.[index]
+                                                                        }
+                                                                        isRequired
+                                                                    >
+                                                                        <HStack>
+                                                                            <PhoneInput
+                                                                                {...field}
+                                                                                country="in"
+                                                                                placeholder="Enter phone number"
+                                                                                countryCodeEditable={false}
+                                                                                containerStyle={{ marginTop: '3.5px' }}
+                                                                                onBlur={() => form.setFieldTouched(`phoneNumbers.${index}`, true)}
+                                                                                onChange={(phoneNumber) =>
+                                                                                    form.setFieldValue(`phoneNumbers.${index}`, phoneNumber)
+                                                                                }
+                                                                            />
+                                                                            {index > 0 && (
+                                                                                <IconButton
+                                                                                    colorScheme="red"
+                                                                                    aria-label='Remove number'
+                                                                                    icon={<GoX />}
+                                                                                    size="xs"
+                                                                                    onClick={() => remove(index)}
+                                                                                />
+                                                                            )}
+                                                                        </HStack>
+                                                                        <FormErrorMessage>
+                                                                            {form.errors.phoneNumbers?.[index]}
+                                                                        </FormErrorMessage>
+                                                                    </FormControl>
+                                                                )}
+                                                            </Field>
 
-                                        <GridItem colSpan={5}>
-                                            <Field name='phoneNumber' validate={validatePhone}>
-                                                {({ field, form }: any) => (
-                                                    <FormControl isInvalid={form.errors.phoneNumber && form.touched.phoneNumber} isRequired>
-                                                        <FormLabel>Phone number</FormLabel>
-                                                        <PhoneInput
-                                                            {...field}
-                                                            country="in"
-                                                            placeholder="Enter phone number"
-                                                            inputStyle={{
-                                                                width: '100%',
-                                                                borderRadius: '0.375rem',
-                                                                border: '1px solid rgba(0, 0, 0, 0.1)',
-                                                            }}
-                                                            countryCodeEditable={false}
-                                                            inputProps={{
-                                                                autoComplete: 'tel',
-                                                                name: 'phoneNumber',
-                                                                as: <Input />
-                                                            }}
-                                                            containerStyle={{ marginTop: '3.5px' }}
-                                                            onBlur={() => form.setFieldTouched('phoneNumber', true)}
-                                                            onChange={(phoneNumber) =>
-                                                                form.setFieldValue('phoneNumber', phoneNumber)
-                                                            }
-                                                        />
-                                                        <FormErrorMessage>{form.errors.phoneNumber}</FormErrorMessage>
-                                                    </FormControl>
-                                                )}
-                                            </Field>
-                                            <Button mt={3} leftIcon={<GoPlus/>} colorScheme='green' size='xs'>
-                                                Add another number
-                                            </Button>
-                                        </GridItem>
+                                                        </div>
+                                                    ))}
+                                                    <Button
+                                                        mt={3}
+                                                        leftIcon={<GoPlus />}
+                                                        colorScheme="green"
+                                                        size="xs"
+                                                        onClick={() => push('')}
+                                                    >
+                                                        Add another number
+                                                    </Button>
+                                                </GridItem>
+                                            )}
+                                        </FieldArray>
 
                                     </Grid>
                                     <Flex mt={10}>
