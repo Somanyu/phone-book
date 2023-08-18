@@ -1,4 +1,4 @@
-import { Input, Button, FormLabel, FormErrorMessage, Heading, Spacer, IconButton, Grid, HStack, GridItem, FormControl, Center, Card, CardBody, Flex } from '@chakra-ui/react'
+import { Input, Button, useToast, FormLabel, FormErrorMessage, Heading, Spacer, IconButton, Grid, HStack, GridItem, FormControl, Center, Card, CardBody, Flex } from '@chakra-ui/react'
 import { GoArrowLeft, GoX, GoCheck, GoPlus } from "react-icons/go";
 import PhoneInput from 'react-phone-input-2';
 import { Field, Form, Formik, FieldArray } from 'formik';
@@ -6,11 +6,23 @@ import { Link } from 'react-router-dom';
 import { useMutation } from '@apollo/client';
 
 import 'react-phone-input-2/lib/style.css';
-import { AddContactWithPhones } from '../config/queries';
+
+// Config files
+import client from '../config/apolloClient';
+import { AddContactWithPhones, GetContactList } from '../config/queries';
+import { Contact } from '../config/types';
 
 type Props = {}
 
 const AddContact = (props: Props) => {
+
+    const toast = useToast();
+
+    const initialValues = {
+        first_name: '',
+        last_name: '',
+        phoneNumbers: [''],
+    };
 
     const [insertContact, { loading }] = useMutation(AddContactWithPhones);
 
@@ -61,8 +73,31 @@ const AddContact = (props: Props) => {
                     <CardBody>
                         <Formik
                             initialValues={{ first_name: '', last_name: '', phoneNumbers: [''] }}
-                            onSubmit={async (values) => {
+                            onSubmit={async (values, { resetForm }) => {
                                 try {
+
+                                    // Check if the first_name already exists
+                                    const { data: existingContactData } = await client.query<{contact: Contact[]}>({
+                                        query: GetContactList,
+                                    });
+
+                                    const existingContact = existingContactData.contact.find(contact => contact.first_name === values.first_name);
+
+                                    if (existingContact) {
+                                        // Toast for duplicate first name
+                                        toast({
+                                            title: 'Duplicate First Name',
+                                            description: 'A contact with the same first name already exists.',
+                                            status: 'warning',
+                                            position: 'top',
+                                            duration: 3500,
+                                            isClosable: true,
+                                        });
+
+                                        return; // Exit the function to prevent insertion
+                                    }
+
+
                                     const { data } = await insertContact({
                                         variables: {
                                             first_name: values.first_name,
@@ -70,8 +105,32 @@ const AddContact = (props: Props) => {
                                             phones: values.phoneNumbers.map(number => ({ number }))
                                         }
                                     });
-                                    console.log('Inserted contact:', data.insert_contact.returning);
+
+                                    // Show toast for successful contact addition
+                                    toast({
+                                        title: 'Contact Added',
+                                        description: 'Contact has been successfully added.',
+                                        status: 'success',
+                                        position: 'top',
+                                        duration: 3500,
+                                        isClosable: true,
+                                    });
+
+                                    resetForm({ values: initialValues });
+
+                                    // console.log('Inserted contact:', data.insert_contact.returning);
+
                                 } catch (error) {
+
+                                    // Show toast for unsuccessful contact addition
+                                    toast({
+                                        title: 'Error occurred',
+                                        description: `${error}`,
+                                        status: 'error',
+                                        position: 'top',
+                                        duration: 4000,
+                                        isClosable: true,
+                                    });
                                     console.error('Error inserting contact:', error);
                                 }
                             }}
