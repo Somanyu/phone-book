@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom';
-import { Avatar, Container, Tabs, TabList, TabPanels, Tab, TabPanel, Badge, Stack, Button, Center, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverHeader, PopoverBody, Table, Thead, IconButton, Tbody, Tr, Th, Td, TableContainer, Card, CardBody, Heading, HStack, useDisclosure, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, InputGroup, Input, InputLeftElement } from '@chakra-ui/react'
+import { Avatar, Container, Tabs, TabList, TabPanels, Tab, TabPanel, Badge, Stack, Button, Center, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverHeader, PopoverBody, Table, Thead, IconButton, Tbody, Tr, Th, Td, TableContainer, Card, CardBody, Heading, HStack, useDisclosure, InputGroup, Input, InputLeftElement } from '@chakra-ui/react'
 import { GoTrash, GoSearch, GoPencil, GoHeart, GoPersonAdd } from "react-icons/go";
-import { useMutation } from '@apollo/client';
 
 // Config files
 import client from '../config/apolloClient';
-import { GetContactList, DeleteContactPhone } from '../config/queries';
+import { GetContactList } from '../config/queries';
 import { Contact } from '../config/types';
 import FavoriteContactList from './FavoriteContactList';
+import ContactDeleteDialog from './ContactDeleteDialog';
 
-type Props = {}
 
-const ContactList = (props: Props) => {
+const ContactList = () => {
 
     const [selectedContactId, setSelectedContactId] = useState<number | null>(null);
     const [contacts, setContacts] = useState<Contact[]>([]);
@@ -20,7 +19,6 @@ const ContactList = (props: Props) => {
     const [favoriteCurrentPage, setFavoriteCurrentPage] = useState<number>(1);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [searchQuery, setSearchQuery] = useState<string>("");
-    const [deleteContactPhone, { loading: deleteLoading }] = useMutation(DeleteContactPhone);
 
     const pageSize = 10; // Number of rows per page
 
@@ -30,7 +28,7 @@ const ContactList = (props: Props) => {
         });
         setContacts(data.contact);
     };
-    
+
 
     const addToFavorites = (contactId: any) => {
         const updatedContacts = contacts.map(contact => {
@@ -187,50 +185,12 @@ const ContactList = (props: Props) => {
                                                                     </Stack>
                                                                 </Td>
 
-                                                                <Modal isOpen={isOpen} onClose={onClose}>
-                                                                    <ModalOverlay />
-                                                                    <ModalContent>
-                                                                        <ModalHeader></ModalHeader>
-                                                                        <ModalCloseButton />
-                                                                        <ModalBody>
-                                                                            {selectedContactId !== null &&
-                                                                                contacts.map((contact) => {
-                                                                                    if (contact.id === selectedContactId) {
-                                                                                        return (
-                                                                                            <div key={contact.id}>
-                                                                                                <Heading as='h4' size='md' mb={4}>
-                                                                                                    Delete contact for {contact.first_name} {contact.last_name} ?
-                                                                                                </Heading>
-                                                                                                <div>
-                                                                                                    <Button onClick={async () => {
-                                                                                                        try {
-                                                                                                            await deleteContactPhone({
-                                                                                                                variables: {
-                                                                                                                    id: selectedContactId,
-                                                                                                                },
-                                                                                                            });
-
-                                                                                                            // Perform any other actions after successful deletion
-                                                                                                        } catch (error) {
-                                                                                                            console.error('Error deleting contact:', error);
-                                                                                                        }
-                                                                                                    }}
-                                                                                                        isLoading={deleteLoading}
-                                                                                                        leftIcon={<GoTrash />}
-                                                                                                        colorScheme='red'
-                                                                                                        variant='solid'>
-                                                                                                        Yes, delete
-                                                                                                    </Button>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        );
-                                                                                    }
-                                                                                    return null;
-                                                                                })}
-                                                                        </ModalBody>
-                                                                        <ModalFooter></ModalFooter>
-                                                                    </ModalContent>
-                                                                </Modal>
+                                                                <ContactDeleteDialog
+                                                                    isOpen={isOpen}
+                                                                    onClose={onClose}
+                                                                    selectedContactId={selectedContactId}
+                                                                    contacts={contacts}
+                                                                />
 
                                                             </Tr>
                                                         );
