@@ -1,14 +1,18 @@
-import { Input, Button, FormLabel, FormErrorMessage, Heading, Spacer, IconButton, Grid, HStack, GridItem, FormControl, Center, Card, CardBody, Flex, VStack, SimpleGrid } from '@chakra-ui/react'
-import { GoPersonAdd, GoX, GoTriangleLeft, GoCheck, GoPlus } from "react-icons/go";
+import { Input, Button, FormLabel, FormErrorMessage, Heading, Spacer, IconButton, Grid, HStack, GridItem, FormControl, Center, Card, CardBody, Flex } from '@chakra-ui/react'
+import { GoArrowLeft, GoX, GoCheck, GoPlus } from "react-icons/go";
 import PhoneInput from 'react-phone-input-2';
 import { Field, Form, Formik, FieldArray } from 'formik';
+import { Link } from 'react-router-dom';
+import { useMutation } from '@apollo/client';
 
 import 'react-phone-input-2/lib/style.css';
-import { Link } from 'react-router-dom';
+import { AddContactWithPhones } from '../config/queries';
 
 type Props = {}
 
 const AddContact = (props: Props) => {
+
+    const [insertContact, { loading }] = useMutation(AddContactWithPhones);
 
     const validateFirstName = (value: string) => {
         let error: string | undefined;
@@ -51,15 +55,25 @@ const AddContact = (props: Props) => {
 
     return (
         <div>
-            <Heading mb={10} mt={10} textAlign={'center'}><IconButton variant={'outline'} aria-label='Add contact' icon={<GoPersonAdd />} /> Add Contact</Heading>
+            <Heading mb={10} mt={10} textAlign={'center'}>Add Contact</Heading>
             <Center>
                 <Card>
                     <CardBody>
                         <Formik
                             initialValues={{ first_name: '', last_name: '', phoneNumbers: [''] }}
-                            onSubmit={(values) => {
-                                // Handle form submission
-                                console.log(values);
+                            onSubmit={async (values) => {
+                                try {
+                                    const { data } = await insertContact({
+                                        variables: {
+                                            first_name: values.first_name,
+                                            last_name: values.last_name,
+                                            phones: values.phoneNumbers.map(number => ({ number }))
+                                        }
+                                    });
+                                    console.log('Inserted contact:', data.insert_contact.returning);
+                                } catch (error) {
+                                    console.error('Error inserting contact:', error);
+                                }
                             }}
                         >
                             {({ values, handleSubmit, setFieldValue }) => (
@@ -155,13 +169,13 @@ const AddContact = (props: Props) => {
                                     </Grid>
                                     <Flex mt={10}>
                                         <Link to='/'>
-                                            <Button leftIcon={<GoTriangleLeft />} colorScheme='red' variant='ghost'>
+                                            <Button leftIcon={<GoArrowLeft />} colorScheme='red' variant='ghost'>
                                                 Contact list
                                             </Button>
                                         </Link>
                                         <Spacer />
-                                        <Button leftIcon={<GoCheck />} type='submit' colorScheme='whatsapp' >
-                                            Save
+                                        <Button isLoading={loading} leftIcon={<GoCheck />} type='submit' colorScheme='whatsapp' >
+                                            Add
                                         </Button>
                                     </Flex>
                                 </Form>
