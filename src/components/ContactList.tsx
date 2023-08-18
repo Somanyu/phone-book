@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom';
-import { Avatar, Container, Tabs, TabList, TabPanels, Tab, TabPanel, Badge, Stack, Button, Center, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverHeader, PopoverBody, Table, Thead, IconButton, Tbody, Tr, Th, Td, TableContainer, Card, CardBody, Heading, HStack, useDisclosure, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Box, InputGroup, Input, InputRightElement, InputLeftElement } from '@chakra-ui/react'
+import { Avatar, Container, Tabs, TabList, TabPanels, Tab, TabPanel, Badge, Stack, Button, Center, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverHeader, PopoverBody, Table, Thead, IconButton, Tbody, Tr, Th, Td, TableContainer, Card, CardBody, Heading, HStack, useDisclosure, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, InputGroup, Input, InputLeftElement } from '@chakra-ui/react'
 import { GoTrash, GoSearch, GoPencil, GoHeart, GoPersonAdd } from "react-icons/go";
+import { useMutation } from '@apollo/client';
 
 // Config files
 import client from '../config/apolloClient';
-import { GetContactList } from '../config/queries';
+import { GetContactList, DeleteContactPhone } from '../config/queries';
 import { Contact } from '../config/types';
+import FavoriteContactList from './FavoriteContactList';
 
 type Props = {}
 
@@ -18,25 +20,17 @@ const ContactList = (props: Props) => {
     const [favoriteCurrentPage, setFavoriteCurrentPage] = useState<number>(1);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [searchQuery, setSearchQuery] = useState<string>("");
+    const [deleteContactPhone, { loading: deleteLoading }] = useMutation(DeleteContactPhone);
 
     const pageSize = 10; // Number of rows per page
 
     const getContacts = async () => {
-        // Check if contacts data is present in local storage
-        const storedContacts = JSON.parse(localStorage.getItem('contacts') || '[]');
-        if (storedContacts.length > 0) {
-            // console.log("FROM LOCAL STORAGE")
-            setContacts(storedContacts);
-        } else {
-            // console.log("NOT FROM LOCAL STORAGE")
-            const { data } = await client.query({
-                query: GetContactList,
-            });
-            setContacts(data.contact);
-            // Store the fetched contacts in local storage
-            localStorage.setItem('contacts', JSON.stringify(data.contact));
-        }
+        const { data } = await client.query({
+            query: GetContactList,
+        });
+        setContacts(data.contact);
     };
+    
 
     const addToFavorites = (contactId: any) => {
         const updatedContacts = contacts.map(contact => {
@@ -156,22 +150,22 @@ const ContactList = (props: Props) => {
                                                                 <Td>
                                                                     {contact.phones && contact.phones.length > 0 ? (
                                                                         <Popover trigger='hover'>
-                                                                            <PopoverTrigger>
-                                                                                <span>
-                                                                                    {contact.phones[0].number}
-                                                                                    {contact.phones.length > 1 && (
+                                                                            <span>
+                                                                                +{contact.phones[0].number}
+                                                                                {contact.phones.length > 1 && (
+                                                                                    <PopoverTrigger>
                                                                                         <Badge ml={2} variant='subtle' colorScheme='green'>
                                                                                             +{contact.phones.length - 1}
                                                                                         </Badge>
-                                                                                    )}
-                                                                                </span>
-                                                                            </PopoverTrigger>
+                                                                                    </PopoverTrigger>
+                                                                                )}
+                                                                            </span>
                                                                             <PopoverContent>
                                                                                 <PopoverHeader fontWeight='semibold'>Other Numbers</PopoverHeader>
                                                                                 <PopoverArrow />
                                                                                 <PopoverBody>
                                                                                     {contact.phones.slice(1).map((phone, index) => (
-                                                                                        <div key={index}>{phone.number}</div>
+                                                                                        <div key={index}>+{phone.number}</div>
                                                                                     ))}
                                                                                 </PopoverBody>
                                                                             </PopoverContent>
@@ -208,7 +202,23 @@ const ContactList = (props: Props) => {
                                                                                                     Delete contact for {contact.first_name} {contact.last_name} ?
                                                                                                 </Heading>
                                                                                                 <div>
-                                                                                                    <Button leftIcon={<GoTrash />} colorScheme='red' variant='solid'>
+                                                                                                    <Button onClick={async () => {
+                                                                                                        try {
+                                                                                                            await deleteContactPhone({
+                                                                                                                variables: {
+                                                                                                                    id: selectedContactId,
+                                                                                                                },
+                                                                                                            });
+
+                                                                                                            // Perform any other actions after successful deletion
+                                                                                                        } catch (error) {
+                                                                                                            console.error('Error deleting contact:', error);
+                                                                                                        }
+                                                                                                    }}
+                                                                                                        isLoading={deleteLoading}
+                                                                                                        leftIcon={<GoTrash />}
+                                                                                                        colorScheme='red'
+                                                                                                        variant='solid'>
                                                                                                         Yes, delete
                                                                                                     </Button>
                                                                                                 </div>
@@ -235,73 +245,18 @@ const ContactList = (props: Props) => {
                                     </TableContainer>
                                 </TabPanel>
 
+                                {/* Favorite Contact List */}
                                 <TabPanel>
-                                    <TableContainer>
-                                        <Table variant='simple'>
-                                            <Thead>
-                                                <Tr>
-                                                    <Th>Profile</Th>
-                                                    <Th>Name</Th>
-                                                    <Th>Phone Numbers</Th>
-                                                    <Th textAlign={'center'}>Actions</Th>
-                                                </Tr>
-                                            </Thead>
-                                            <Tbody>
-                                                {contacts
-                                                    .filter(contact => contact.isFavorite)
-                                                    .slice(favoriteStartIndex, favoriteEndIndex)
-                                                    .map(favoriteContact => (
-                                                        <Tr key={favoriteContact.id}>
-
-                                                            <Td><Avatar name={`${favoriteContact.first_name} ${favoriteContact.last_name}`} src={`https://api.dicebear.com/6.x/lorelei/svg?seed=${favoriteContact.first_name}`} /></Td>
-
-                                                            <Td>{favoriteContact.first_name} {favoriteContact.last_name}</Td>
-
-                                                            <Td>
-                                                                {favoriteContact.phones && favoriteContact.phones.length > 0 ? (
-                                                                    <Popover trigger='hover'>
-                                                                        <PopoverTrigger>
-                                                                            <span>
-                                                                                {favoriteContact.phones[0].number}
-                                                                                {favoriteContact.phones.length > 1 && (
-                                                                                    <Badge ml={2} variant='subtle' colorScheme='green'>
-                                                                                        +{favoriteContact.phones.length - 1}
-                                                                                    </Badge>
-                                                                                )}
-                                                                            </span>
-                                                                        </PopoverTrigger>
-                                                                        <PopoverContent>
-                                                                            <PopoverHeader fontWeight='semibold'>Other Numbers</PopoverHeader>
-                                                                            <PopoverArrow />
-                                                                            <PopoverBody>
-                                                                                {favoriteContact.phones.slice(1).map((phone, index) => (
-                                                                                    <div key={index}>{phone.number}</div>
-                                                                                ))}
-                                                                            </PopoverBody>
-                                                                        </PopoverContent>
-                                                                    </Popover>
-                                                                ) : (
-                                                                    'No phone number'
-                                                                )}
-                                                            </Td>
-
-                                                            <Td>
-                                                                <Stack direction='row' spacing={4}>
-                                                                    <IconButton onClick={() => removeFromFavorites(favoriteContact.id)} variant='solid' colorScheme='pink' aria-label='Add to favorites' icon={<GoHeart />} />
-                                                                    <IconButton variant='outline' colorScheme='blue' aria-label='Edit contact' icon={<GoPencil />} />
-                                                                    <IconButton onClick={() => onOpenModal(favoriteContact.id)} variant='solid' colorScheme='red' aria-label='Delete contact' icon={<GoTrash />} />
-                                                                </Stack>
-                                                            </Td>
-                                                        </Tr>
-                                                    ))}
-                                            </Tbody>
-                                        </Table>
-                                        <Pagination
-                                            currentPage={favoriteCurrentPage}
-                                            totalPages={Math.ceil(contacts.filter(contact => contact.isFavorite).length / pageSize)}
-                                            onPageChange={handleFavoritePageChange}
-                                        />
-                                    </TableContainer>
+                                    <FavoriteContactList
+                                        contacts={contacts}
+                                        favoriteCurrentPage={favoriteCurrentPage}
+                                        pageSize={pageSize}
+                                        favoriteStartIndex={favoriteStartIndex}
+                                        favoriteEndIndex={favoriteEndIndex}
+                                        handleFavoritePageChange={handleFavoritePageChange}
+                                        removeFromFavorites={removeFromFavorites}
+                                        onOpenModal={onOpenModal}
+                                    />
                                 </TabPanel>
                             </TabPanels>
                         </Tabs>
@@ -323,7 +278,7 @@ interface PaginationProps {
     onPageChange: (newPage: number) => void;
 }
 
-const Pagination: React.FC<PaginationProps> = ({
+export const Pagination: React.FC<PaginationProps> = ({
     currentPage,
     totalPages,
     onPageChange,
