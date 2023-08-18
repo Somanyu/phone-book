@@ -6,15 +6,20 @@ import reportWebVitals from './reportWebVitals';
 
 import { ChakraProvider } from '@chakra-ui/react';
 
+import { ApolloProvider } from '@apollo/client';
+import client from './config/apolloClient';
+
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
-  <ChakraProvider>
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
-  </ChakraProvider>
+  <ApolloProvider client={client}>
+    <ChakraProvider>
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+    </ChakraProvider>
+  </ApolloProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function
