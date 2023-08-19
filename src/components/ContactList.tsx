@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom';
-import { Avatar, Container, Tabs, TabList, TabPanels, Tab, TabPanel, Badge, Stack, Button, Center, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverHeader, PopoverBody, Table, Thead, IconButton, Tbody, Tr, Th, Td, TableContainer, Card, CardBody, Heading, HStack, useDisclosure, InputGroup, Input, InputLeftElement } from '@chakra-ui/react'
+import { Avatar, Tooltip, Container, Tabs, TabList, TabPanels, Tab, TabPanel, Badge, Stack, Button, Center, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverHeader, PopoverBody, Table, Thead, IconButton, Tbody, Tr, Th, Td, TableContainer, Card, CardBody, Heading, HStack, useDisclosure, InputGroup, Input, InputLeftElement, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, FormControl, FormLabel } from '@chakra-ui/react'
 import { GoTrash, GoSearch, GoPencil, GoHeart, GoPersonAdd } from "react-icons/go";
 
 // Config files
@@ -19,6 +19,8 @@ const ContactList = () => {
     const [favoriteCurrentPage, setFavoriteCurrentPage] = useState<number>(1);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [searchQuery, setSearchQuery] = useState<string>("");
+
+    const [isEditModalOpen, editModalOpen] = useState(false);
 
     const pageSize = 10; // Number of rows per page
 
@@ -176,14 +178,46 @@ const ContactList = () => {
                                                                 <Td>
                                                                     <Stack direction='row' spacing={4}>
                                                                         {isFavorite ? (
-                                                                            <IconButton onClick={() => removeFromFavorites(contact.id)} variant='solid' colorScheme='pink' aria-label='Remove from favorites' icon={<GoHeart />} />
+                                                                            <Tooltip hasArrow placement='top' label='Remove from favorites'>
+                                                                                <IconButton onClick={() => removeFromFavorites(contact.id)} variant='solid' colorScheme='pink' aria-label='Remove from favorites' icon={<GoHeart />} />
+                                                                            </Tooltip>
                                                                         ) : (
-                                                                            <IconButton onClick={() => addToFavorites(contact.id)} variant='ghost' colorScheme='pink' aria-label='Add to favorites' icon={<GoHeart />} />
+                                                                            <Tooltip hasArrow placement='top' label='Add to favorites'>
+                                                                                <IconButton onClick={() => addToFavorites(contact.id)} variant='ghost' colorScheme='pink' aria-label='Add to favorites' icon={<GoHeart />} />
+                                                                            </Tooltip>
                                                                         )}
-                                                                        <IconButton variant='outline' colorScheme='blue' aria-label='Edit contact' icon={<GoPencil />} />
-                                                                        <IconButton onClick={() => onOpenModal(contact.id)} variant='solid' colorScheme='red' aria-label='Delete contact' icon={<GoTrash />} />
+                                                                        <IconButton onClick={() => editModalOpen(true)} variant='outline' colorScheme='blue' aria-label='Edit contact' icon={<GoPencil />} />
+                                                                        <Tooltip hasArrow placement='top' label='Delete'>
+                                                                            <IconButton onClick={() => onOpenModal(contact.id)} variant='solid' colorScheme='red' aria-label='Delete contact' icon={<GoTrash />} />
+                                                                        </Tooltip>
                                                                     </Stack>
                                                                 </Td>
+
+                                                                <Modal closeOnOverlayClick={false} isOpen={isEditModalOpen} onClose={() => editModalOpen(false)}>
+                                                                    <ModalOverlay />
+                                                                    <ModalContent>
+                                                                        <ModalHeader>Create your account</ModalHeader>
+                                                                        <ModalCloseButton />
+                                                                        <ModalBody pb={6}>
+                                                                            <FormControl>
+                                                                                <FormLabel>First name</FormLabel>
+                                                                                <Input placeholder='First name' />
+                                                                            </FormControl>
+
+                                                                            <FormControl mt={4}>
+                                                                                <FormLabel>Last name</FormLabel>
+                                                                                <Input placeholder='Last name' />
+                                                                            </FormControl>
+                                                                        </ModalBody>
+
+                                                                        <ModalFooter>
+                                                                            <Button colorScheme='blue' mr={3}>
+                                                                                Save
+                                                                            </Button>
+                                                                            <Button onClick={() => editModalOpen(false)}>Cancel</Button>
+                                                                        </ModalFooter>
+                                                                    </ModalContent>
+                                                                </Modal>
 
                                                                 <ContactDeleteDialog
                                                                     isOpen={isOpen}
