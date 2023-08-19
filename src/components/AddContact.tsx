@@ -162,10 +162,10 @@ const AddContact = (props: Props) => {
                                         </GridItem>
                                     </Grid>
 
-                                    <Grid templateColumns='repeat(5, 1fr)' gap={4}>
+                                    <Grid templateColumns='repeat(5, 2fr)' gap={4}>
                                         <FieldArray name="phoneNumbers">
                                             {({ push, remove }: any) => (
-                                                <GridItem colSpan={3}>
+                                                <GridItem colSpan={4}>
                                                     <FormLabel>Phone number</FormLabel>
                                                     {values.phoneNumbers.map((phoneNumber: any, index: any) => (
                                                         <div key={index}>
@@ -187,6 +187,13 @@ const AddContact = (props: Props) => {
                                                                                 country="in"
                                                                                 placeholder="Enter phone number"
                                                                                 countryCodeEditable={false}
+                                                                                inputStyle={{
+                                                                                    height: '2.5rem',
+                                                                                    fontSize: '1rem',
+                                                                                    borderRadius: '0.375rem',
+                                                                                    borderColor: 'inherit',
+                                                                                    background: 'inherit'
+                                                                                }}
                                                                                 containerStyle={{ marginTop: '3.5px' }}
                                                                                 onBlur={() => form.setFieldTouched(`phoneNumbers.${index}`, true)}
                                                                                 onChange={(phoneNumber) =>

@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom';
-import { Avatar, Tooltip, Container, Tabs, TabList, TabPanels, Tab, TabPanel, Badge, Stack, Button, Center, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverHeader, PopoverBody, Table, Thead, IconButton, Tbody, Tr, Th, Td, TableContainer, Card, CardBody, Heading, HStack, useDisclosure, InputGroup, Input, InputLeftElement, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, FormControl, FormLabel } from '@chakra-ui/react'
+import { Avatar, Tooltip, Container, Tabs, TabList, TabPanels, Tab, TabPanel, Badge, Stack, Button, Center, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverHeader, PopoverBody, Table, Thead, IconButton, Tbody, Tr, Th, Td, TableContainer, Card, CardBody, Heading, HStack, useDisclosure, InputGroup, Input, InputLeftElement } from '@chakra-ui/react'
 import { GoTrash, GoSearch, GoPencil, GoHeart, GoPersonAdd } from "react-icons/go";
 
 // Config files
 import client from '../config/apolloClient';
 import { GetContactList } from '../config/queries';
 import { Contact } from '../config/types';
+
+// Components
 import FavoriteContactList from './FavoriteContactList';
 import ContactDeleteDialog from './ContactDeleteDialog';
 
@@ -19,8 +21,6 @@ const ContactList = () => {
     const [favoriteCurrentPage, setFavoriteCurrentPage] = useState<number>(1);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [searchQuery, setSearchQuery] = useState<string>("");
-
-    const [isEditModalOpen, editModalOpen] = useState(false);
 
     const pageSize = 10; // Number of rows per page
 
@@ -91,7 +91,7 @@ const ContactList = () => {
         <div>
             <HStack mb={10} mt={'10'} justify={'center'}>
                 <Heading textAlign={'center'}>Contact List</Heading>
-                <Link to='/add/contact'>
+                <Link to='/contact/add'>
                     <Button size={'sm'} ml={'3'} leftIcon={<GoPersonAdd />} colorScheme='whatsapp' variant='solid'>
                         Add Contact
                     </Button>
@@ -186,38 +186,18 @@ const ContactList = () => {
                                                                                 <IconButton onClick={() => addToFavorites(contact.id)} variant='ghost' colorScheme='pink' aria-label='Add to favorites' icon={<GoHeart />} />
                                                                             </Tooltip>
                                                                         )}
-                                                                        <IconButton onClick={() => editModalOpen(true)} variant='outline' colorScheme='blue' aria-label='Edit contact' icon={<GoPencil />} />
+                                                                        <Tooltip hasArrow placement='top' label='Edit contact'>
+                                                                            <Link to={`/contact/edit/${contact.id}`}>
+                                                                                <IconButton variant='outline' colorScheme='blue' aria-label='Edit contact' icon={<GoPencil />} />
+                                                                            </Link>
+                                                                            {/* <IconButton onClick={() => onEditModalOpen(contact.id)} variant='outline' colorScheme='blue' aria-label='Edit contact' icon={<GoPencil />} /> */}
+                                                                        </Tooltip>
                                                                         <Tooltip hasArrow placement='top' label='Delete'>
                                                                             <IconButton onClick={() => onOpenModal(contact.id)} variant='solid' colorScheme='red' aria-label='Delete contact' icon={<GoTrash />} />
                                                                         </Tooltip>
                                                                     </Stack>
                                                                 </Td>
 
-                                                                <Modal closeOnOverlayClick={false} isOpen={isEditModalOpen} onClose={() => editModalOpen(false)}>
-                                                                    <ModalOverlay />
-                                                                    <ModalContent>
-                                                                        <ModalHeader>Create your account</ModalHeader>
-                                                                        <ModalCloseButton />
-                                                                        <ModalBody pb={6}>
-                                                                            <FormControl>
-                                                                                <FormLabel>First name</FormLabel>
-                                                                                <Input placeholder='First name' />
-                                                                            </FormControl>
-
-                                                                            <FormControl mt={4}>
-                                                                                <FormLabel>Last name</FormLabel>
-                                                                                <Input placeholder='Last name' />
-                                                                            </FormControl>
-                                                                        </ModalBody>
-
-                                                                        <ModalFooter>
-                                                                            <Button colorScheme='blue' mr={3}>
-                                                                                Save
-                                                                            </Button>
-                                                                            <Button onClick={() => editModalOpen(false)}>Cancel</Button>
-                                                                        </ModalFooter>
-                                                                    </ModalContent>
-                                                                </Modal>
 
                                                                 <ContactDeleteDialog
                                                                     isOpen={isOpen}
