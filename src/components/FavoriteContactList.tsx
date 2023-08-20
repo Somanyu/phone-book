@@ -1,5 +1,5 @@
 import React from 'react'
-import { Avatar, Badge, Stack, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverHeader, PopoverBody, Table, Thead, IconButton, Tbody, Tr, Th, Td, TableContainer, Tooltip } from '@chakra-ui/react'
+import { Avatar, Badge, Stack, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverHeader, PopoverBody, Table, Thead, IconButton, Tbody, Tr, Th, Td, TableContainer, Tooltip, Box, Text, Center, Image, Flex, Highlight } from '@chakra-ui/react'
 import { GoHeart, GoPencil, GoTrash } from 'react-icons/go';
 import { Pagination } from './ContactList';
 
@@ -108,6 +108,16 @@ const FavoriteContactList: React.FC<FavoriteContactListProps> = ({
                                 </Td>
                             </Tr>
                         ))}
+                    {contacts.filter(contact => contact.isFavorite).length === 0 && (
+                        <Tr>
+                            <Td colSpan={4}>
+                                <Flex justify="center" align="center">
+                                    <Image boxSize="200px" src="/images/favorite.jpg" alt="Add favorite" />
+                                </Flex>
+                                <Text textAlign={'center'}>Add friends to brighten your favorites list!</Text>
+                            </Td>
+                        </Tr>
+                    )}
                 </Tbody>
             </Table>
 
