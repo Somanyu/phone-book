@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Input, useToast, FormControl, FormLabel, Center, Card, CardBody, Grid, Heading, GridItem, Flex, Button, Spacer, FormErrorMessage, HStack, ButtonGroup, Popover, PopoverTrigger, IconButton, PopoverContent, PopoverArrow, PopoverCloseButton, PopoverHeader, PopoverBody } from '@chakra-ui/react'
+import { Input, useToast, FormControl, FormLabel, Center, Card, CardBody, Grid, Heading, GridItem, Flex, Button, Spacer, FormErrorMessage, HStack, ButtonGroup, Popover, PopoverTrigger, IconButton, PopoverContent, PopoverArrow, PopoverCloseButton, PopoverHeader, PopoverBody, Box } from '@chakra-ui/react'
 import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 import PhoneInput from 'react-phone-input-2';
@@ -140,9 +140,9 @@ const EditContact = (props: Props) => {
                                                 </GridItem>
                                             </Grid>
 
-                                            <Grid templateColumns='repeat(5, 2fr)' gap={4}>
+                                            <Grid templateColumns={{ base: '1fr', md: 'repeat(5, 2fr)' }} gap={4}>
 
-                                                <GridItem colSpan={3}>
+                                                <GridItem colSpan={{ base: 1, md: 3 }}>
                                                     {/* Phone number input */}
                                                     <FormControl isReadOnly>
                                                         <FormLabel>Phone number</FormLabel>
@@ -161,86 +161,90 @@ const EditContact = (props: Props) => {
                                                                         }}
                                                                     />
 
-                                                                    <Popover trigger='click' placement='right'>
-                                                                        <PopoverTrigger>
-                                                                            <IconButton size={'md'} aria-label='Edit contact' icon={<GoPencil />} />
-                                                                        </PopoverTrigger>
-                                                                        <PopoverContent>
-                                                                            <PopoverArrow />
-                                                                            <PopoverCloseButton />
-                                                                            <PopoverHeader>Update number</PopoverHeader>
-                                                                            <PopoverBody>
-                                                                                <>
-                                                                                    {/* Edit current phone number input */}
-                                                                                    <FormControl isRequired>
-                                                                                        <FormLabel>Phone Number</FormLabel>
-                                                                                        <PhoneInput
-                                                                                            country="in"
-                                                                                            placeholder="Enter phone number"
-                                                                                            countryCodeEditable={false}
-                                                                                            containerStyle={{ marginTop: '3.5px' }}
-                                                                                            inputStyle={{
-                                                                                                height: '2.5rem',
-                                                                                                fontSize: '1rem',
-                                                                                                borderRadius: '0.375rem',
-                                                                                                borderColor: 'inherit',
-                                                                                                background: 'inherit',
-                                                                                            }}
-                                                                                            value={phone.number}
-                                                                                            onChange={(value) => setEditingPhoneNumber(value)}
-                                                                                        />
-                                                                                    </FormControl>
-                                                                                    <ButtonGroup mt={2} display='flex' justifyContent='flex-end'>
-                                                                                        <Button
-                                                                                            type='button'
-                                                                                            size={'sm'}
-                                                                                            colorScheme='whatsapp'
-                                                                                            onClick={async () => {
-                                                                                                try {
-                                                                                                    // Update only the phone number
-                                                                                                    const updatedData = await editPhoneNumberMutation({
-                                                                                                        variables: {
-                                                                                                            pk_columns: {
-                                                                                                                contact_id: contact.id,
-                                                                                                                number: phone.number
-                                                                                                            },
-                                                                                                            new_phone_number: editingPhoneNumber
-                                                                                                        }
-                                                                                                    });
+                                                                    <Box
+                                                                        display={{ base: 'block', md: 'flex' }}
+                                                                        alignItems={{ base: 'center', md: 'flex-start' }}
+                                                                    >
+                                                                        <Popover trigger='click' placement='right'>
+                                                                            <PopoverTrigger>
+                                                                                <IconButton size={'md'} aria-label='Edit contact' icon={<GoPencil />} />
+                                                                            </PopoverTrigger>
+                                                                            <PopoverContent>
+                                                                                <PopoverArrow />
+                                                                                <PopoverCloseButton />
+                                                                                <PopoverHeader>Update number</PopoverHeader>
+                                                                                <PopoverBody>
+                                                                                    <>
+                                                                                        {/* Edit current phone number input */}
+                                                                                        <FormControl isRequired>
+                                                                                            <FormLabel>Phone Number</FormLabel>
+                                                                                            <PhoneInput
+                                                                                                country="in"
+                                                                                                placeholder="Enter phone number"
+                                                                                                countryCodeEditable={false}
+                                                                                                containerStyle={{ marginTop: '3.5px' }}
+                                                                                                inputStyle={{
+                                                                                                    height: '2.5rem',
+                                                                                                    fontSize: '1rem',
+                                                                                                    borderRadius: '0.375rem',
+                                                                                                    borderColor: 'inherit',
+                                                                                                    background: 'inherit',
+                                                                                                }}
+                                                                                                value={phone.number}
+                                                                                                onChange={(value) => setEditingPhoneNumber(value)}
+                                                                                            />
+                                                                                        </FormControl>
+                                                                                        <ButtonGroup mt={2} display='flex' justifyContent='flex-end'>
+                                                                                            <Button
+                                                                                                type='button'
+                                                                                                size={'sm'}
+                                                                                                colorScheme='whatsapp'
+                                                                                                onClick={async () => {
+                                                                                                    try {
+                                                                                                        // Update only the phone number
+                                                                                                        const updatedData = await editPhoneNumberMutation({
+                                                                                                            variables: {
+                                                                                                                pk_columns: {
+                                                                                                                    contact_id: contact.id,
+                                                                                                                    number: phone.number
+                                                                                                                },
+                                                                                                                new_phone_number: editingPhoneNumber
+                                                                                                            }
+                                                                                                        });
 
-                                                                                                    if (updatedData && updatedData.data && updatedData.data.update_phone_by_pk) {
-                                                                                                        // Show toast for successful phone number update
+                                                                                                        if (updatedData && updatedData.data && updatedData.data.update_phone_by_pk) {
+                                                                                                            // Show toast for successful phone number update
+                                                                                                            toast({
+                                                                                                                title: 'Phone Number Updated',
+                                                                                                                description: 'Phone number has been successfully updated.',
+                                                                                                                status: 'success',
+                                                                                                                position: 'top',
+                                                                                                                duration: 3500,
+                                                                                                                isClosable: true,
+                                                                                                            });
+                                                                                                        }
+                                                                                                    } catch (error) {
+                                                                                                        console.error('Error updating phone number: ', error);
+                                                                                                        // Show toast for unsuccessful phone number update
                                                                                                         toast({
-                                                                                                            title: 'Phone Number Updated',
-                                                                                                            description: 'Phone number has been successfully updated.',
-                                                                                                            status: 'success',
+                                                                                                            title: 'Error occurred',
+                                                                                                            description: `${error}`,
+                                                                                                            status: 'error',
                                                                                                             position: 'top',
-                                                                                                            duration: 3500,
+                                                                                                            duration: 4000,
                                                                                                             isClosable: true,
                                                                                                         });
                                                                                                     }
-                                                                                                } catch (error) {
-                                                                                                    console.error('Error updating phone number: ', error);
-                                                                                                    // Show toast for unsuccessful phone number update
-                                                                                                    toast({
-                                                                                                        title: 'Error occurred',
-                                                                                                        description: `${error}`,
-                                                                                                        status: 'error',
-                                                                                                        position: 'top',
-                                                                                                        duration: 4000,
-                                                                                                        isClosable: true,
-                                                                                                    });
-                                                                                                }
-                                                                                            }}
-                                                                                        >
-                                                                                            Update
-                                                                                        </Button>
-                                                                                    </ButtonGroup>
-                                                                                </>
-                                                                            </PopoverBody>
-                                                                        </PopoverContent>
-                                                                    </Popover>
-
+                                                                                                }}
+                                                                                            >
+                                                                                                Update
+                                                                                            </Button>
+                                                                                        </ButtonGroup>
+                                                                                    </>
+                                                                                </PopoverBody>
+                                                                            </PopoverContent>
+                                                                        </Popover>
+                                                                    </Box>
                                                                 </HStack>
                                                             </div>
                                                         ))}
