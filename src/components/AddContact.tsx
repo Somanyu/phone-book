@@ -12,6 +12,9 @@ import client from '../config/apolloClient';
 import { AddContactWithPhones, GetContactList } from '../config/queries';
 import { Contact } from '../config/types';
 
+// Util files
+import { validateInput, validatePhoneNumber } from '../utils/validationUtils';
+
 type Props = {}
 
 const AddContact = (props: Props) => {
@@ -28,47 +31,10 @@ const AddContact = (props: Props) => {
 
     const [insertContact, { loading }] = useMutation(AddContactWithPhones); // Mutation for inserting a contact
 
-    // Validation first name input
-    const validateFirstName = (value: string) => {
-        let error: string | undefined;
-        
-        if (!value) {
-            error = 'First name is required';
-        } else if (!/^[A-Za-z]+$/.test(value)) {
-            error = 'Only letters are allowed';
-        } else if (value.length < 3 || value.length > 20) {
-            error = 'First name must be between 3 and 20 characters';
-        }
-        return error;
-    };
-    
-    // Validation last name input
-    const validateLastName = (value: string) => {
-        let error: string | undefined;
-        
-        if (!value) {
-            error = 'Last name is required';
-        } else if (!/^[A-Za-z]+$/.test(value)) {
-            error = 'Only letters are allowed';
-        } else if (value.length < 3 || value.length > 20) {
-            error = 'Last name must be between 3 and 20 characters';
-        }
-        return error;
-    };
-    
-    // Validation phone number input
-    const validatePhone = (value: string) => {
-        let error: string | undefined;
-
-        if (!value) {
-            error = 'Phone number is required';
-        } else if (!/^[0-9]+$/.test(value)) {
-            error = 'Only letters are allowed';
-        } else if (value.length < 7 || value.length > 20) {
-            error = 'Number must be between 7 and 20 digits';
-        }
-        return error;
-    };
+    // Validation from utils
+    const validateFirstName = (value: string) => validateInput(value, 'First name'); // Validate first name
+    const validateLastName = (value: string) => validateInput(value, 'Last name'); // Validate last name
+    const validatePhone = (value: any) => validatePhoneNumber(value, 'Phone number'); // Validate phone number
 
     return (
         <div>
@@ -82,7 +48,7 @@ const AddContact = (props: Props) => {
                                 try {
 
                                     // Check if the first_name already exists
-                                    const { data: existingContactData } = await client.query<{contact: Contact[]}>({
+                                    const { data: existingContactData } = await client.query<{ contact: Contact[] }>({
                                         query: GetContactList,
                                     });
 
@@ -144,7 +110,7 @@ const AddContact = (props: Props) => {
                                 <Form>
                                     <Grid templateColumns='repeat(2, 1fr)' gap={4} mb={3}>
                                         <GridItem>
-                                            
+
                                             {/* First name input */}
                                             <Field name='first_name' validate={validateFirstName}>
                                                 {({ field, form }: any) => (

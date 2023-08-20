@@ -13,6 +13,9 @@ import { Contact } from '../config/types';
 import { GoArrowLeft, GoCheck, GoPencil } from 'react-icons/go';
 import { Field, Form, Formik } from 'formik';
 
+// Util files
+import { validateInput } from '../utils/validationUtils';
+
 type Props = {}
 
 const EditContact = (props: Props) => {
@@ -33,33 +36,9 @@ const EditContact = (props: Props) => {
     // Define the mutation function
     const [editPhoneNumberMutation] = useMutation(EditPhoneNumber);
 
-    // Validate first name input
-    const validateFirstName = (value: string) => {
-        let error: string | undefined;
-
-        if (!value) {
-            error = 'First name is required';
-        } else if (!/^[A-Za-z]+$/.test(value)) {
-            error = 'Only letters are allowed';
-        } else if (value.length < 3 || value.length > 20) {
-            error = 'First name must be between 3 and 20 characters';
-        }
-        return error;
-    };
-
-    // Validate last name input
-    const validateLastName = (value: string) => {
-        let error: string | undefined;
-
-        if (!value) {
-            error = 'Last name is required';
-        } else if (!/^[A-Za-z]+$/.test(value)) {
-            error = 'Only letters are allowed';
-        } else if (value.length < 3 || value.length > 20) {
-            error = 'Last name must be between 3 and 20 characters';
-        }
-        return error;
-    };
+    // Validation from utils
+    const validateFirstName = (value: string) => validateInput(value, 'First name'); // Validate first name
+    const validateLastName = (value: string) => validateInput(value, 'Last name'); // Validate last name
 
     // Fetch contact details based on 'id' parameter
     const { loading, error, data } = useQuery(GetContactDetail, {
