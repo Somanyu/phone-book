@@ -21,15 +21,28 @@ const ContactList = () => {
     const [favoriteCurrentPage, setFavoriteCurrentPage] = useState<number>(1);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [searchQuery, setSearchQuery] = useState<string>("");
-
     const pageSize = 10; // Number of rows per page
 
     const getContacts = async () => {
         const { data } = await client.query({
             query: GetContactList,
+            variables: {
+                order_by: [{ created_at: 'desc' }] // Order by created_at in descending order
+              }
         });
-        setContacts(data.contact);
+    
+        // Retrieve favorite contacts from localStorage, or initialize an empty array if none are found
+        const storedFavorites = JSON.parse(localStorage.getItem('favoriteContacts') || '[]');
+    
+        // Merge the stored favorites with the fetched contacts
+        const updatedContacts = data.contact.map((contact: any) => ({
+            ...contact,
+            isFavorite: storedFavorites.includes(contact.id),
+        }));
+    
+        setContacts(updatedContacts);
     };
+    
 
 
     const addToFavorites = (contactId: any) => {
@@ -40,10 +53,12 @@ const ContactList = () => {
             return contact;
         });
         setContacts(updatedContacts);
-        localStorage.setItem('contacts', JSON.stringify(updatedContacts));
+    
+        // Update favorites in localStorage.
+        const favoriteIds = updatedContacts.filter(contact => contact.isFavorite).map(contact => contact.id);
+        localStorage.setItem('favoriteContacts', JSON.stringify(favoriteIds));
     };
-
-
+    
     const removeFromFavorites = (contactId: any) => {
         const updatedContacts = contacts.map(contact => {
             if (contact.id === contactId) {
@@ -52,8 +67,12 @@ const ContactList = () => {
             return contact;
         });
         setContacts(updatedContacts);
-        localStorage.setItem('contacts', JSON.stringify(updatedContacts));
+    
+        // Update favorites in localStorage.
+        const favoriteIds = updatedContacts.filter(contact => contact.isFavorite).map(contact => contact.id);
+        localStorage.setItem('favoriteContacts', JSON.stringify(favoriteIds));
     };
+    
 
     const filteredContacts = contacts.filter(contact =>
         contact.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -64,8 +83,19 @@ const ContactList = () => {
 
 
     useEffect(() => {
-        getContacts();
+        const storedContacts = localStorage.getItem('contacts');
+        if (storedContacts) {
+            // Parse and set the contacts from local storage
+            setContacts(JSON.parse(storedContacts));
+        } else {
+            // Fetch the contacts from the GraphQL API
+            getContacts();
+        }
     }, []);
+
+    // useEffect(() => {
+    //     getContacts();
+    // }, []);
 
     const startIndex = (currentPage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
