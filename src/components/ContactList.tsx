@@ -11,40 +11,59 @@ import { Contact } from '../config/types';
 // Components
 import FavoriteContactList from './FavoriteContactList';
 import ContactDeleteDialog from './ContactDeleteDialog';
+import RefreshButton from './RefreshButton';
 
 
 const ContactList = () => {
 
-    const [selectedContactId, setSelectedContactId] = useState<number | null>(null);
-    const [contacts, setContacts] = useState<Contact[]>([]);
-    const [currentPage, setCurrentPage] = useState<number>(1);
-    const [favoriteCurrentPage, setFavoriteCurrentPage] = useState<number>(1);
-    const { isOpen, onOpen, onClose } = useDisclosure();
-    const [searchQuery, setSearchQuery] = useState<string>("");
+    const [selectedContactId, setSelectedContactId] = useState<number | null>(null); // State to manage selected contact ID
+    const [contacts, setContacts] = useState<Contact[]>([]); // State to manage contact list
+    const [currentPage, setCurrentPage] = useState<number>(1); // State to handle pagination
+    const [favoriteCurrentPage, setFavoriteCurrentPage] = useState<number>(1); // State to manage favorite list 
+    const { isOpen, onOpen, onClose } = useDisclosure(); // Chakra UI disclosure hooks for modal
+    const [searchQuery, setSearchQuery] = useState<string>(""); // State to handle search functionality
     const pageSize = 10; // Number of rows per page
 
+    // Fetch contacts from local storage if available; otherwise, fetch from the API
     const getContacts = async () => {
-        const { data } = await client.query({
-            query: GetContactList,
-            variables: {
-                order_by: [{ created_at: 'desc' }] // Order by created_at in descending order
-              }
-        });
-    
-        // Retrieve favorite contacts from localStorage, or initialize an empty array if none are found
-        const storedFavorites = JSON.parse(localStorage.getItem('favoriteContacts') || '[]');
-    
-        // Merge the stored favorites with the fetched contacts
-        const updatedContacts = data.contact.map((contact: any) => ({
-            ...contact,
-            isFavorite: storedFavorites.includes(contact.id),
-        }));
-    
-        setContacts(updatedContacts);
+        // Retrieve contacts from localStorage or initialize an empty array if none are found
+        const storedContacts = JSON.parse(localStorage.getItem('contactList') || '[]');
+
+        // Check if there are stored contacts in local storage
+        if (storedContacts.length > 0) {
+            // Retrieve favorite contacts from localStorage, or initialize an empty array if none are found
+            const storedFavorites = JSON.parse(localStorage.getItem('favoriteContacts') || '[]');
+
+            // Merge the stored favorites with the fetched contacts
+            const updatedContacts = storedContacts.map((contact: any) => ({
+                ...contact,
+                isFavorite: storedFavorites.includes(contact.id),
+            }));
+
+            setContacts(updatedContacts);
+        } else {
+            try {
+                // Fetch contacts from the GraphQL API
+                const { data } = await client.query({
+                    query: GetContactList,
+                    variables: {
+                        order_by: [{ created_at: 'desc' }] // Order by created_at in descending order
+                    }
+                });
+
+                // Update the state with the fetched contacts
+                setContacts(data.contact);
+
+                // Store the fetched contacts in local storage for future use
+                // localStorage.setItem('contactList', JSON.stringify(data.contact));
+            } catch (error) {
+                console.error('Error fetching contacts from API:', error);
+            }
+        }
     };
-    
 
 
+    // Add a contact to favorites
     const addToFavorites = (contactId: any) => {
         const updatedContacts = contacts.map(contact => {
             if (contact.id === contactId) {
@@ -53,12 +72,13 @@ const ContactList = () => {
             return contact;
         });
         setContacts(updatedContacts);
-    
+
         // Update favorites in localStorage.
         const favoriteIds = updatedContacts.filter(contact => contact.isFavorite).map(contact => contact.id);
         localStorage.setItem('favoriteContacts', JSON.stringify(favoriteIds));
     };
-    
+
+    // Remove a contact from favorites
     const removeFromFavorites = (contactId: any) => {
         const updatedContacts = contacts.map(contact => {
             if (contact.id === contactId) {
@@ -67,13 +87,14 @@ const ContactList = () => {
             return contact;
         });
         setContacts(updatedContacts);
-    
+
         // Update favorites in localStorage.
         const favoriteIds = updatedContacts.filter(contact => contact.isFavorite).map(contact => contact.id);
         localStorage.setItem('favoriteContacts', JSON.stringify(favoriteIds));
     };
-    
 
+
+    // Filter contacts based on search query
     const filteredContacts = contacts.filter(contact =>
         contact.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         contact.last_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -81,7 +102,7 @@ const ContactList = () => {
     );
 
 
-
+    // Fetch contacts from local storage or GraphQL API when the component mounts
     useEffect(() => {
         const storedContacts = localStorage.getItem('contacts');
         if (storedContacts) {
@@ -97,6 +118,7 @@ const ContactList = () => {
     //     getContacts();
     // }, []);
 
+    // Pagination calculation for contact list
     const startIndex = (currentPage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
 
@@ -108,10 +130,12 @@ const ContactList = () => {
     const favoriteStartIndex = (favoriteCurrentPage - 1) * pageSize;
     const favoriteEndIndex = favoriteStartIndex + pageSize;
 
+    // Handle page changes
     const handleFavoritePageChange = (newFavoritePage: number) => {
         setFavoriteCurrentPage(newFavoritePage);
     }
 
+    // Open contact modal
     const onOpenModal = (contactId: number) => {
         setSelectedContactId(contactId);
         onOpen();
@@ -128,19 +152,23 @@ const ContactList = () => {
                 </Link>
             </HStack>
 
+            {/* Search input */}
             <Container>
-                <InputGroup mb={4} size='md'>
-                    <Input
-                        pr='4.5rem'
-                        type={'text'}
-                        value={searchQuery}
-                        placeholder='Search contacts'
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                    <InputLeftElement pointerEvents='none'>
-                        <GoSearch color='gray.300' />
-                    </InputLeftElement>
-                </InputGroup>
+                <HStack>
+                    <InputGroup mb={4} size='md'>
+                        <Input
+                            pr='4.5rem'
+                            type={'text'}
+                            value={searchQuery}
+                            placeholder='Search contacts'
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                        <InputLeftElement pointerEvents='none'>
+                            <GoSearch color='gray.300' />
+                        </InputLeftElement>
+                    </InputGroup>
+                    <RefreshButton />
+                </HStack>
             </Container>
 
             <Center>
@@ -173,13 +201,17 @@ const ContactList = () => {
                                                         return (
                                                             <Tr key={contact.id}>
 
+                                                                {/* Dicebear API for avatar */}
                                                                 <Td><Avatar name={`${contact.first_name} ${contact.last_name}`} src={`https://api.dicebear.com/6.x/lorelei/svg?seed=${contact.first_name}`} /></Td>
 
+                                                                {/* Contact's first name and last name */}
                                                                 <Td>{contact.first_name} {contact.last_name}</Td>
 
                                                                 <Td>
                                                                     {contact.phones && contact.phones.length > 0 ? (
                                                                         <Popover trigger='hover'>
+
+                                                                            {/* Display first phone number in the array  */}
                                                                             <span>
                                                                                 +{contact.phones[0].number}
                                                                                 {contact.phones.length > 1 && (
@@ -190,6 +222,8 @@ const ContactList = () => {
                                                                                     </PopoverTrigger>
                                                                                 )}
                                                                             </span>
+
+                                                                            {/* Display other phone numbers in the array */}
                                                                             <PopoverContent>
                                                                                 <PopoverHeader fontWeight='semibold'>Other Numbers</PopoverHeader>
                                                                                 <PopoverArrow />
@@ -209,26 +243,29 @@ const ContactList = () => {
                                                                     <Stack direction='row' spacing={4}>
                                                                         {isFavorite ? (
                                                                             <Tooltip hasArrow placement='top' label='Remove from favorites'>
+                                                                                {/* Remove favorite */}
                                                                                 <IconButton onClick={() => removeFromFavorites(contact.id)} variant='solid' colorScheme='pink' aria-label='Remove from favorites' icon={<GoHeart />} />
                                                                             </Tooltip>
                                                                         ) : (
                                                                             <Tooltip hasArrow placement='top' label='Add to favorites'>
+                                                                                {/* Add favorite */}
                                                                                 <IconButton onClick={() => addToFavorites(contact.id)} variant='ghost' colorScheme='pink' aria-label='Add to favorites' icon={<GoHeart />} />
                                                                             </Tooltip>
                                                                         )}
                                                                         <Tooltip hasArrow placement='top' label='Edit contact'>
+                                                                            {/* Edit contact */}
                                                                             <Link to={`/contact/edit/${contact.id}`}>
                                                                                 <IconButton variant='outline' colorScheme='blue' aria-label='Edit contact' icon={<GoPencil />} />
                                                                             </Link>
-                                                                            {/* <IconButton onClick={() => onEditModalOpen(contact.id)} variant='outline' colorScheme='blue' aria-label='Edit contact' icon={<GoPencil />} /> */}
                                                                         </Tooltip>
                                                                         <Tooltip hasArrow placement='top' label='Delete'>
+                                                                            {/* Delete contact */}
                                                                             <IconButton onClick={() => onOpenModal(contact.id)} variant='solid' colorScheme='red' aria-label='Delete contact' icon={<GoTrash />} />
                                                                         </Tooltip>
                                                                     </Stack>
                                                                 </Td>
 
-
+                                                                {/* Confirmation for dialog for deleting a contact */}
                                                                 <ContactDeleteDialog
                                                                     isOpen={isOpen}
                                                                     onClose={onClose}
@@ -241,6 +278,8 @@ const ContactList = () => {
                                                     })}
                                             </Tbody>
                                         </Table>
+
+                                        {/* Pagination component */}
                                         <Pagination
                                             currentPage={currentPage}
                                             totalPages={Math.ceil(filteredContacts.length / pageSize)}
