@@ -16,10 +16,14 @@ import { Field, Form, Formik } from 'formik';
 type Props = {}
 
 const EditContact = (props: Props) => {
+
+    // 'id' parameter from routes
     const { id } = useParams<{ id: string }>();
 
+    // Chakra UI toast
     const toast = useToast();
 
+    // State to store the contact details and mutation to update them
     const [contact, setContact] = useState<Contact | null>(null);
     const [updateContact] = useMutation(EditContactById);
 
@@ -29,6 +33,7 @@ const EditContact = (props: Props) => {
     // Define the mutation function
     const [editPhoneNumberMutation] = useMutation(EditPhoneNumber);
 
+    // Validate first name input
     const validateFirstName = (value: string) => {
         let error: string | undefined;
 
@@ -42,6 +47,7 @@ const EditContact = (props: Props) => {
         return error;
     };
 
+    // Validate last name input
     const validateLastName = (value: string) => {
         let error: string | undefined;
 
@@ -55,17 +61,20 @@ const EditContact = (props: Props) => {
         return error;
     };
 
+    // Fetch contact details based on 'id' parameter
     const { loading, error, data } = useQuery(GetContactDetail, {
         variables: { id },
         fetchPolicy: 'network-only',
     });
 
+    // Set the contact details once available
     useEffect(() => {
         if (!loading && !error && data) {
             setContact(data.contact_by_pk);
         }
     }, [loading, error, data]);
 
+    // If data not available, shoe error
     if (error) return <p>Error: {error.message}</p>;
 
     return (
@@ -86,6 +95,7 @@ const EditContact = (props: Props) => {
                                     onSubmit={async (values) => {
 
                                         try {
+                                            // Update first name and last name
                                             const updatedData = await updateContact({
                                                 variables: {
                                                     id: contact.id,
@@ -126,6 +136,7 @@ const EditContact = (props: Props) => {
                                         <Form>
                                             <Grid templateColumns='repeat(2, 1fr)' gap={4} mb={3}>
                                                 <GridItem>
+                                                    {/* First name input */}
                                                     <Field name='first_name' validate={validateFirstName}>
                                                         {({ field, form }: any) => (
                                                             <FormControl isInvalid={form.errors.first_name && form.touched.first_name} isRequired>
@@ -137,6 +148,7 @@ const EditContact = (props: Props) => {
                                                     </Field>
                                                 </GridItem>
                                                 <GridItem>
+                                                    {/* Last name input */}
                                                     <Field name='last_name' validate={validateLastName}>
                                                         {({ field, form }: any) => (
                                                             <FormControl isInvalid={form.errors.last_name && form.touched.last_name} isRequired>
@@ -152,6 +164,7 @@ const EditContact = (props: Props) => {
                                             <Grid templateColumns='repeat(5, 2fr)' gap={4}>
 
                                                 <GridItem colSpan={3}>
+                                                    {/* Phone number input */}
                                                     <FormControl isReadOnly>
                                                         <FormLabel>Phone number</FormLabel>
                                                         {contact?.phones.map((phone, index) => (
@@ -179,6 +192,7 @@ const EditContact = (props: Props) => {
                                                                             <PopoverHeader>Update number</PopoverHeader>
                                                                             <PopoverBody>
                                                                                 <>
+                                                                                    {/* Edit current phone number input */}
                                                                                     <FormControl isRequired>
                                                                                         <FormLabel>Phone Number</FormLabel>
                                                                                         <PhoneInput
@@ -204,13 +218,14 @@ const EditContact = (props: Props) => {
                                                                                             colorScheme='whatsapp'
                                                                                             onClick={async () => {
                                                                                                 try {
+                                                                                                    // Update only the phone number
                                                                                                     const updatedData = await editPhoneNumberMutation({
                                                                                                         variables: {
                                                                                                             pk_columns: {
                                                                                                                 contact_id: contact.id,
                                                                                                                 number: phone.number
                                                                                                             },
-                                                                                                            new_phone_number: editingPhoneNumber 
+                                                                                                            new_phone_number: editingPhoneNumber
                                                                                                         }
                                                                                                     });
 

@@ -12,8 +12,8 @@ import {
 import { GoTrash } from 'react-icons/go';
 import { useMutation } from '@apollo/client';
 
-import { DeleteContactPhone } from '../config/queries';
 // Config files
+import { DeleteContactPhone } from '../config/queries';
 import { Contact } from '../config/types';
 
 interface ContactDeleteDialogProps {
@@ -30,9 +30,9 @@ const ContactDeleteDialog: React.FC<ContactDeleteDialogProps> = ({
   selectedContactId,
   contacts,
 }) => {
-  const toast = useToast();
-  const cancelRef = useRef<HTMLButtonElement>(null);
-  const [deleteContactPhone, { loading: deleteLoading }] = useMutation(DeleteContactPhone);
+  const toast = useToast(); // Chakra UI toast
+  const cancelRef = useRef<HTMLButtonElement>(null); // Create a ref for the cancel button
+  const [deleteContactPhone, { loading: deleteLoading }] = useMutation(DeleteContactPhone); // Mutation for deleting a contact
 
   return (
     <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose}>
@@ -56,6 +56,7 @@ const ContactDeleteDialog: React.FC<ContactDeleteDialogProps> = ({
                       <Button
                         onClick={async () => {
                           try {
+                            // Query to delete a contact
                             await deleteContactPhone({
                               variables: {
                                 id: selectedContactId,

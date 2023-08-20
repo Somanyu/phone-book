@@ -47,13 +47,17 @@ const FavoriteContactList: React.FC<FavoriteContactListProps> = ({
                         .map(favoriteContact => (
                             <Tr key={favoriteContact.id}>
 
+                                {/* Dicebear API for avatar */}
                                 <Td><Avatar name={`${favoriteContact.first_name} ${favoriteContact.last_name}`} src={`https://api.dicebear.com/6.x/lorelei/svg?seed=${favoriteContact.first_name}`} /></Td>
 
+                                {/* Contact's first name and last name */}
                                 <Td>{favoriteContact.first_name} {favoriteContact.last_name}</Td>
 
                                 <Td>
                                     {favoriteContact.phones && favoriteContact.phones.length > 0 ? (
                                         <Popover trigger='hover'>
+
+                                            {/* Display first phone number in the array  */}
                                             <span>
                                                 +{favoriteContact.phones[0].number}
                                                 {favoriteContact.phones.length > 1 && (
@@ -64,6 +68,8 @@ const FavoriteContactList: React.FC<FavoriteContactListProps> = ({
                                                     </PopoverTrigger>
                                                 )}
                                             </span>
+
+                                            {/* Display other phone numbers in the array */}
                                             <PopoverContent>
                                                 <PopoverHeader fontWeight='semibold'>Other Numbers</PopoverHeader>
                                                 <PopoverArrow />
@@ -81,15 +87,20 @@ const FavoriteContactList: React.FC<FavoriteContactListProps> = ({
 
                                 <Td>
                                     <Stack direction='row' spacing={4}>
+
+                                        {/* Remove favorite */}
                                         <Tooltip hasArrow placement='top' label='Remove from favorites'>
                                             <IconButton onClick={() => removeFromFavorites(favoriteContact.id)} variant='solid' colorScheme='pink' aria-label='Add to favorites' icon={<GoHeart />} />
                                         </Tooltip>
+
+                                        {/* Edit contact */}
                                         <Tooltip hasArrow placement='top' label='Edit contact'>
                                             <Link to={`/contact/edit/${favoriteContact.id}`}>
                                                 <IconButton variant='outline' colorScheme='blue' aria-label='Edit contact' icon={<GoPencil />} />
                                             </Link>
-                                            {/* <IconButton variant='outline' colorScheme='blue' aria-label='Edit contact' icon={<GoPencil />} /> */}
                                         </Tooltip>
+
+                                        {/* Delete contact */}
                                         <Tooltip hasArrow placement='top' label='Delete'>
                                             <IconButton onClick={() => onOpenModal(favoriteContact.id)} variant='solid' colorScheme='red' aria-label='Delete contact' icon={<GoTrash />} />
                                         </Tooltip>
@@ -99,6 +110,8 @@ const FavoriteContactList: React.FC<FavoriteContactListProps> = ({
                         ))}
                 </Tbody>
             </Table>
+
+            {/* Pagination component */}
             <Pagination
                 currentPage={favoriteCurrentPage}
                 totalPages={Math.ceil(contacts.filter(contact => contact.isFavorite).length / pageSize)}

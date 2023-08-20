@@ -16,19 +16,22 @@ type Props = {}
 
 const AddContact = (props: Props) => {
 
+    // Chakra UI toast
     const toast = useToast();
 
+    // Initial values for the Formik 
     const initialValues = {
         first_name: '',
         last_name: '',
         phoneNumbers: [''],
     };
 
-    const [insertContact, { loading }] = useMutation(AddContactWithPhones);
+    const [insertContact, { loading }] = useMutation(AddContactWithPhones); // Mutation for inserting a contact
 
+    // Validation first name input
     const validateFirstName = (value: string) => {
         let error: string | undefined;
-
+        
         if (!value) {
             error = 'First name is required';
         } else if (!/^[A-Za-z]+$/.test(value)) {
@@ -38,10 +41,11 @@ const AddContact = (props: Props) => {
         }
         return error;
     };
-
+    
+    // Validation last name input
     const validateLastName = (value: string) => {
         let error: string | undefined;
-
+        
         if (!value) {
             error = 'Last name is required';
         } else if (!/^[A-Za-z]+$/.test(value)) {
@@ -51,7 +55,8 @@ const AddContact = (props: Props) => {
         }
         return error;
     };
-
+    
+    // Validation phone number input
     const validatePhone = (value: string) => {
         let error: string | undefined;
 
@@ -97,7 +102,7 @@ const AddContact = (props: Props) => {
                                         return; // Exit the function to prevent insertion
                                     }
 
-
+                                    // Query to insert contact
                                     const { data } = await insertContact({
                                         variables: {
                                             first_name: values.first_name,
@@ -139,6 +144,8 @@ const AddContact = (props: Props) => {
                                 <Form>
                                     <Grid templateColumns='repeat(2, 1fr)' gap={4} mb={3}>
                                         <GridItem>
+                                            
+                                            {/* First name input */}
                                             <Field name='first_name' validate={validateFirstName}>
                                                 {({ field, form }: any) => (
                                                     <FormControl isInvalid={form.errors.first_name && form.touched.first_name} isRequired>
@@ -150,6 +157,8 @@ const AddContact = (props: Props) => {
                                             </Field>
                                         </GridItem>
                                         <GridItem>
+
+                                            {/* Last name input */}
                                             <Field name='last_name' validate={validateLastName}>
                                                 {({ field, form }: any) => (
                                                     <FormControl isInvalid={form.errors.last_name && form.touched.last_name} isRequired>
@@ -166,6 +175,8 @@ const AddContact = (props: Props) => {
                                         <FieldArray name="phoneNumbers">
                                             {({ push, remove }: any) => (
                                                 <GridItem colSpan={4}>
+
+                                                    {/* Phone number input */}
                                                     <FormLabel>Phone number</FormLabel>
                                                     {values.phoneNumbers.map((phoneNumber: any, index: any) => (
                                                         <div key={index}>
@@ -201,6 +212,7 @@ const AddContact = (props: Props) => {
                                                                                 }
                                                                             />
                                                                             {index > 0 && (
+                                                                                // Button to remove extra phone input field
                                                                                 <IconButton
                                                                                     colorScheme="red"
                                                                                     aria-label='Remove number'
@@ -219,6 +231,8 @@ const AddContact = (props: Props) => {
 
                                                         </div>
                                                     ))}
+
+                                                    {/* Button to add a extra phone input field */}
                                                     <Button
                                                         mt={3}
                                                         leftIcon={<GoPlus />}
