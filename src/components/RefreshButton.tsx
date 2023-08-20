@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { IconButton, Tooltip } from '@chakra-ui/react';
 import { useQuery } from '@apollo/client';
 import { GoSync } from 'react-icons/go';
@@ -6,7 +6,6 @@ import { GoSync } from 'react-icons/go';
 
 // Config files
 import { GetContactList } from '../config/queries';
-import { Contact } from '../config/types';
 
 type Props = {}
 

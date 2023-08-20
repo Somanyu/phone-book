@@ -1,5 +1,5 @@
 import React from 'react'
-import { Avatar, Badge, Stack, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverHeader, PopoverBody, Table, Thead, IconButton, Tbody, Tr, Th, Td, TableContainer, Tooltip, Box, Text, Center, Image, Flex, Highlight } from '@chakra-ui/react'
+import { Avatar, Badge, Stack, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverHeader, PopoverBody, Table, Thead, IconButton, Tbody, Tr, Th, Td, TableContainer, Tooltip, Text, Image, Flex } from '@chakra-ui/react'
 import { GoHeart, GoPencil, GoTrash } from 'react-icons/go';
 import { Pagination } from './ContactList';
 
