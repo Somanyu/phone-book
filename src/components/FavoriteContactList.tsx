@@ -1,10 +1,11 @@
 import React from 'react'
-import { Avatar, Badge, Stack, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverHeader, PopoverBody, Table, Thead, IconButton, Tbody, Tr, Th, Td, TableContainer } from '@chakra-ui/react'
+import { Avatar, Badge, Stack, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverHeader, PopoverBody, Table, Thead, IconButton, Tbody, Tr, Th, Td, TableContainer, Tooltip } from '@chakra-ui/react'
 import { GoHeart, GoPencil, GoTrash } from 'react-icons/go';
 import { Pagination } from './ContactList';
 
 // Config files
 import { Contact } from '../config/types';
+import { Link } from 'react-router-dom';
 
 interface FavoriteContactListProps {
     contacts: Contact[];
@@ -80,9 +81,18 @@ const FavoriteContactList: React.FC<FavoriteContactListProps> = ({
 
                                 <Td>
                                     <Stack direction='row' spacing={4}>
-                                        <IconButton onClick={() => removeFromFavorites(favoriteContact.id)} variant='solid' colorScheme='pink' aria-label='Add to favorites' icon={<GoHeart />} />
-                                        <IconButton variant='outline' colorScheme='blue' aria-label='Edit contact' icon={<GoPencil />} />
-                                        <IconButton onClick={() => onOpenModal(favoriteContact.id)} variant='solid' colorScheme='red' aria-label='Delete contact' icon={<GoTrash />} />
+                                        <Tooltip hasArrow placement='top' label='Remove from favorites'>
+                                            <IconButton onClick={() => removeFromFavorites(favoriteContact.id)} variant='solid' colorScheme='pink' aria-label='Add to favorites' icon={<GoHeart />} />
+                                        </Tooltip>
+                                        <Tooltip hasArrow placement='top' label='Edit contact'>
+                                            <Link to={`/contact/edit/${favoriteContact.id}`}>
+                                                <IconButton variant='outline' colorScheme='blue' aria-label='Edit contact' icon={<GoPencil />} />
+                                            </Link>
+                                            {/* <IconButton variant='outline' colorScheme='blue' aria-label='Edit contact' icon={<GoPencil />} /> */}
+                                        </Tooltip>
+                                        <Tooltip hasArrow placement='top' label='Delete'>
+                                            <IconButton onClick={() => onOpenModal(favoriteContact.id)} variant='solid' colorScheme='red' aria-label='Delete contact' icon={<GoTrash />} />
+                                        </Tooltip>
                                     </Stack>
                                 </Td>
                             </Tr>
