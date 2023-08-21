@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom';
 import { Avatar, Tooltip, Container, Tabs, TabList, TabPanels, Tab, TabPanel, Badge, Stack, Button, Center, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverHeader, PopoverBody, Table, Thead, IconButton, Tbody, Tr, Th, Td, TableContainer, Card, CardBody, Heading, HStack, useDisclosure, InputGroup, Input, InputLeftElement } from '@chakra-ui/react'
 import { GoTrash, GoSearch, GoPencil, GoHeart, GoPersonAdd } from "react-icons/go";
-import { css } from '@emotion/react';
 
 
 // Config files
@@ -143,39 +142,13 @@ const ContactList = () => {
         onOpen();
     };
 
-    const addContactHeading = css`
-        font-family: 'Roboto', sans-serif;
-        font-weight: 500;
-    `
-    const addContactButton = css`
-        font-family: 'Nunito', sans-serif;
-        font-weight: 300;
-        &:hover {
-            box-shadow: rgba(0, 0, 0, 0.1) 0px 20px 25px -5px, rgba(0, 0, 0, 0.04) 0px 10px 10px -5px;
-        }
-    `
-
-    const secondaryText = css`
-        font-family: 'Nunito', sans-serif;
-    `
-    
-    const primaryText = css`
-        font-family: 'Roboto', sans-serif;
-    `
-    
-    const deleteButton = css`
-        &:hover {
-            box-shadow: rgba(0, 0, 0, 0.1) 0px 20px 25px -5px, rgba(0, 0, 0, 0.04) 0px 10px 10px -5px;
-        }
-    `
-
 
     return (
         <div>
             <HStack mb={10} mt={'10'} justify={'center'}>
-                <Heading as='h3' size='2xl' css={addContactHeading} textAlign={'center'}>Contact List</Heading>
+                <Heading as='h3' size='2xl' textAlign={'center'}>Contact List</Heading>
                 <Link to='/contact/add'>
-                    <Button css={addContactButton} size={'sm'} ml={'3'} leftIcon={<GoPersonAdd />} colorScheme='whatsapp' variant='solid'>
+                    <Button size={'sm'} ml={'3'} leftIcon={<GoPersonAdd />} colorScheme='whatsapp' variant='solid'>
                         Add Contact
                     </Button>
                 </Link>
@@ -187,7 +160,6 @@ const ContactList = () => {
                     <InputGroup mb={4} size='md'>
                         <Input
                             pr='4.5rem'
-                            css={secondaryText}
                             type={'text'}
                             value={searchQuery}
                             placeholder='Search contacts'
@@ -206,8 +178,8 @@ const ContactList = () => {
                     <CardBody>
                         <Tabs isFitted variant='line'>
                             <TabList>
-                                <Tab css={primaryText}>Contact List</Tab>
-                                <Tab css={primaryText}>Favorite Contacts</Tab>
+                                <Tab>Contact List</Tab>
+                                <Tab>Favorite Contacts</Tab>
                             </TabList>
                             <TabPanels>
 
@@ -217,13 +189,13 @@ const ContactList = () => {
                                         <Table variant='simple'>
                                             <Thead>
                                                 <Tr>
-                                                    <Th css={primaryText}>Profile</Th>
-                                                    <Th css={primaryText}>Name</Th>
-                                                    <Th css={primaryText}>Phone Numbers</Th>
-                                                    <Th css={primaryText} textAlign={'center'}>Actions</Th>
+                                                    <Th>Profile</Th>
+                                                    <Th>Name</Th>
+                                                    <Th>Phone Numbers</Th>
+                                                    <Th textAlign={'center'}>Actions</Th>
                                                 </Tr>
                                             </Thead>
-                                            <Tbody css={secondaryText}>
+                                            <Tbody>
                                                 {filteredContacts
                                                     .slice(startIndex, endIndex)
                                                     .map((contact) => {
@@ -290,7 +262,7 @@ const ContactList = () => {
                                                                         </Tooltip>
                                                                         <Tooltip hasArrow placement='top' label='Delete'>
                                                                             {/* Delete contact */}
-                                                                            <IconButton css={deleteButton} onClick={() => onOpenModal(contact.id)} variant='solid' colorScheme='red' aria-label='Delete contact' icon={<GoTrash />} />
+                                                                            <IconButton onClick={() => onOpenModal(contact.id)} variant='solid' colorScheme='red' aria-label='Delete contact' icon={<GoTrash />} />
                                                                         </Tooltip>
                                                                     </Stack>
                                                                 </Td>

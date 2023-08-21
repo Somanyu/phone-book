@@ -15,7 +15,6 @@ import { useMutation } from '@apollo/client';
 // Config files
 import { DeleteContactPhone } from '../config/queries';
 import { Contact } from '../config/types';
-import { css } from '@emotion/react';
 
 interface ContactDeleteDialogProps {
   isOpen: boolean;
@@ -35,23 +34,6 @@ const ContactDeleteDialog: React.FC<ContactDeleteDialogProps> = ({
   const cancelRef = useRef<HTMLButtonElement>(null); // Create a ref for the cancel button
   const [deleteContactPhone, { loading: deleteLoading }] = useMutation(DeleteContactPhone); // Mutation for deleting a contact
 
-  const secondaryText = css`
-    font-family: 'Nunito', sans-serif;
-  `
-
-  const primaryText = css`
-    font-family: 'Roboto', sans-serif;
-    font-weight: 500;
-  `
-
-  const buttonStyle = css`
-    font-family: 'Roboto', sans-serif;
-    font-weight: 500;
-    &:hover {
-        box-shadow: rgba(0, 0, 0, 0.1) 0px 20px 25px -5px, rgba(0, 0, 0, 0.04) 0px 10px 10px -5px;
-    }
-  `
-
   return (
     <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose}>
       <AlertDialogOverlay>
@@ -61,18 +43,17 @@ const ContactDeleteDialog: React.FC<ContactDeleteDialogProps> = ({
               if (contact.id === selectedContactId) {
                 return (
                   <div key={contact.id}>
-                    <AlertDialogHeader css={primaryText} fontSize="lg" fontWeight="bold">
+                    <AlertDialogHeader fontSize="lg" fontWeight="bold">
                       Delete {contact.first_name}'s contact ?
                     </AlertDialogHeader>
-                    <AlertDialogBody css={secondaryText}>
+                    <AlertDialogBody>
                       Are you sure? You can't undo this action afterwards.
                     </AlertDialogBody>
                     <AlertDialogFooter>
-                      <Button css={buttonStyle} ref={cancelRef} onClick={onClose}>
+                      <Button ref={cancelRef} onClick={onClose}>
                         Cancel
                       </Button>
                       <Button
-                        css={buttonStyle}
                         onClick={async () => {
                           try {
                             // Query to delete a contact

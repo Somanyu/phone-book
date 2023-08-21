@@ -14,7 +14,6 @@ import { Contact } from '../config/types';
 
 // Util files
 import { validateInput, validatePhoneNumber } from '../utils/validationUtils';
-import { css } from '@emotion/react';
 
 type Props = {}
 
@@ -36,22 +35,6 @@ const AddContact = (props: Props) => {
     const validateFirstName = (value: string) => validateInput(value, 'First name'); // Validate first name
     const validateLastName = (value: string) => validateInput(value, 'Last name'); // Validate last name
     const validatePhone = (value: any) => validatePhoneNumber(value, 'Phone number'); // Validate phone number
-
-    const secondaryText = css`
-    font-family: 'Nunito', sans-serif;
-    `
-
-    const primaryText = css`
-        font-family: 'Roboto', sans-serif;
-    `
-
-    const buttonStyle = css`
-        font-family: 'Roboto', sans-serif;
-        font-weight: 500;
-        &:hover {
-            box-shadow: rgba(0, 0, 0, 0.1) 0px 20px 25px -5px, rgba(0, 0, 0, 0.04) 0px 10px 10px -5px;
-        }
-    `
 
     return (
         <div>
@@ -132,7 +115,7 @@ const AddContact = (props: Props) => {
                                             <Field name='first_name' validate={validateFirstName}>
                                                 {({ field, form }: any) => (
                                                     <FormControl isInvalid={form.errors.first_name && form.touched.first_name} isRequired>
-                                                        <FormLabel css={primaryText}>First name</FormLabel>
+                                                        <FormLabel>First name</FormLabel>
                                                         <Input {...field} placeholder='John' isRequired={true} />
                                                         <FormErrorMessage>{form.errors.first_name}</FormErrorMessage>
                                                     </FormControl>
@@ -145,7 +128,7 @@ const AddContact = (props: Props) => {
                                             <Field name='last_name' validate={validateLastName}>
                                                 {({ field, form }: any) => (
                                                     <FormControl isInvalid={form.errors.last_name && form.touched.last_name} isRequired>
-                                                        <FormLabel css={primaryText}>Last name</FormLabel>
+                                                        <FormLabel>Last name</FormLabel>
                                                         <Input {...field} placeholder='John' isRequired={true} />
                                                         <FormErrorMessage>{form.errors.last_name}</FormErrorMessage>
                                                     </FormControl>
@@ -160,7 +143,7 @@ const AddContact = (props: Props) => {
                                                 <GridItem colSpan={4}>
 
                                                     {/* Phone number input */}
-                                                    <FormLabel css={primaryText}>Phone number</FormLabel>
+                                                    <FormLabel>Phone number</FormLabel>
                                                     {values.phoneNumbers.map((phoneNumber: any, index: any) => (
                                                         <div key={index}>
                                                             <Field
@@ -197,7 +180,6 @@ const AddContact = (props: Props) => {
                                                                             {index > 0 && (
                                                                                 // Button to remove extra phone input field
                                                                                 <IconButton
-                                                                                    css={buttonStyle}
                                                                                     colorScheme="red"
                                                                                     aria-label='Remove number'
                                                                                     icon={<GoX />}
@@ -218,7 +200,6 @@ const AddContact = (props: Props) => {
 
                                                     {/* Button to add a extra phone input field */}
                                                     <Button
-                                                        css={buttonStyle}
                                                         mt={3}
                                                         leftIcon={<GoPlus />}
                                                         colorScheme="green"
@@ -234,12 +215,12 @@ const AddContact = (props: Props) => {
                                     </Grid>
                                     <Flex mt={10}>
                                         <Link to='/'>
-                                            <Button css={buttonStyle} leftIcon={<GoArrowLeft />} colorScheme='red' variant='ghost'>
+                                            <Button leftIcon={<GoArrowLeft />} colorScheme='red' variant='ghost'>
                                                 Contact list
                                             </Button>
                                         </Link>
                                         <Spacer />
-                                        <Button css={buttonStyle} isLoading={loading} leftIcon={<GoCheck />} type='submit' colorScheme='whatsapp' >
+                                        <Button isLoading={loading} leftIcon={<GoCheck />} type='submit' colorScheme='whatsapp' >
                                             Add
                                         </Button>
                                     </Flex>
