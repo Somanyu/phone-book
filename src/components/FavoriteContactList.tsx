@@ -128,7 +128,7 @@ const FavoriteContactList: React.FC<FavoriteContactListProps> = ({
                         <Tr>
                             <Td colSpan={4}>
                                 <Flex justify="center" align="center">
-                                    <Image boxSize="200px" src="/images/favorite.jpg" alt="Add favorite" />
+                                    <Image boxSize="200px" src="/images/favorite.webp" alt="Add favorite" />
                                 </Flex>
                                 <Text css={primaryText} textAlign={'center'}>Add friends to brighten your favorites list!</Text>
                             </Td>
