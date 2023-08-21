@@ -2,10 +2,11 @@ import React from 'react'
 import { Avatar, Badge, Stack, Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverHeader, PopoverBody, Table, Thead, IconButton, Tbody, Tr, Th, Td, TableContainer, Tooltip, Text, Image, Flex } from '@chakra-ui/react'
 import { GoHeart, GoPencil, GoTrash } from 'react-icons/go';
 import { Pagination } from './ContactList';
+import { Link } from 'react-router-dom';
+import { css } from '@emotion/react';
 
 // Config files
 import { Contact } from '../config/types';
-import { Link } from 'react-router-dom';
 
 interface FavoriteContactListProps {
     contacts: Contact[];
@@ -29,18 +30,33 @@ const FavoriteContactList: React.FC<FavoriteContactListProps> = ({
     removeFromFavorites,
     onOpenModal,
 }) => {
+
+    const secondaryText = css`
+        font-family: 'Nunito', sans-serif;
+    `
+
+    const primaryText = css`
+        font-family: 'Roboto', sans-serif;
+    `
+
+    const deleteButton = css`
+        &:hover {
+            box-shadow: rgba(0, 0, 0, 0.1) 0px 20px 25px -5px, rgba(0, 0, 0, 0.04) 0px 10px 10px -5px;
+        }
+    `
+
     return (
         <TableContainer>
             <Table variant='simple'>
                 <Thead>
                     <Tr>
-                        <Th>Profile</Th>
-                        <Th>Name</Th>
-                        <Th>Phone Numbers</Th>
-                        <Th textAlign={'center'}>Actions</Th>
+                        <Th css={primaryText}>Profile</Th>
+                        <Th css={primaryText}>Name</Th>
+                        <Th css={primaryText}>Phone Numbers</Th>
+                        <Th css={primaryText} textAlign={'center'}>Actions</Th>
                     </Tr>
                 </Thead>
-                <Tbody>
+                <Tbody css={secondaryText}>
                     {contacts
                         .filter(contact => contact.isFavorite)
                         .slice(favoriteStartIndex, favoriteEndIndex)
@@ -102,7 +118,7 @@ const FavoriteContactList: React.FC<FavoriteContactListProps> = ({
 
                                         {/* Delete contact */}
                                         <Tooltip hasArrow placement='top' label='Delete'>
-                                            <IconButton onClick={() => onOpenModal(favoriteContact.id)} variant='solid' colorScheme='red' aria-label='Delete contact' icon={<GoTrash />} />
+                                            <IconButton css={deleteButton} onClick={() => onOpenModal(favoriteContact.id)} variant='solid' colorScheme='red' aria-label='Delete contact' icon={<GoTrash />} />
                                         </Tooltip>
                                     </Stack>
                                 </Td>
@@ -114,7 +130,7 @@ const FavoriteContactList: React.FC<FavoriteContactListProps> = ({
                                 <Flex justify="center" align="center">
                                     <Image boxSize="200px" src="/images/favorite.jpg" alt="Add favorite" />
                                 </Flex>
-                                <Text textAlign={'center'}>Add friends to brighten your favorites list!</Text>
+                                <Text css={primaryText} textAlign={'center'}>Add friends to brighten your favorites list!</Text>
                             </Td>
                         </Tr>
                     )}

@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 import PhoneInput from 'react-phone-input-2';
 import { useMutation } from '@apollo/client';
+import { css } from '@emotion/react';
 
 import 'react-phone-input-2/lib/style.css';
 
@@ -53,6 +54,22 @@ const EditContact = (props: Props) => {
         }
     }, [loading, error, data]);
 
+    const secondaryText = css`
+    font-family: 'Nunito', sans-serif;
+    `
+
+    const primaryText = css`
+        font-family: 'Roboto', sans-serif;
+    `
+
+    const buttonStyle = css`
+        font-family: 'Roboto', sans-serif;
+        font-weight: 500;
+        &:hover {
+            box-shadow: rgba(0, 0, 0, 0.1) 0px 20px 25px -5px, rgba(0, 0, 0, 0.04) 0px 10px 10px -5px;
+        }
+    `
+
     // If data not available, shoe error
     if (error) return <p>Error: {error.message}</p>;
 
@@ -60,7 +77,7 @@ const EditContact = (props: Props) => {
         <div>
             {contact ? (
                 <React.Fragment>
-                    <Heading mb={10} mt={10} textAlign={'center'}>Edit {contact?.first_name || ""} Contact</Heading>
+                    <Heading css={primaryText} mb={10} mt={10} textAlign={'center'}>Edit {contact?.first_name || ""} Contact</Heading>
                     <Center>
                         <Card>
                             <CardBody>
@@ -119,9 +136,9 @@ const EditContact = (props: Props) => {
                                                     <Field name='first_name' validate={validateFirstName}>
                                                         {({ field, form }: any) => (
                                                             <FormControl isInvalid={form.errors.first_name && form.touched.first_name} isRequired>
-                                                                <FormLabel>First name</FormLabel>
+                                                                <FormLabel css={primaryText}>First name</FormLabel>
                                                                 <Input {...field} isRequired={true} value={field.value || ''} />
-                                                                <FormErrorMessage>{form.errors.first_name}</FormErrorMessage>
+                                                                <FormErrorMessage css={secondaryText}>{form.errors.first_name}</FormErrorMessage>
                                                             </FormControl>
                                                         )}
                                                     </Field>
@@ -131,9 +148,9 @@ const EditContact = (props: Props) => {
                                                     <Field name='last_name' validate={validateLastName}>
                                                         {({ field, form }: any) => (
                                                             <FormControl isInvalid={form.errors.last_name && form.touched.last_name} isRequired>
-                                                                <FormLabel>Last name</FormLabel>
+                                                                <FormLabel css={primaryText}>Last name</FormLabel>
                                                                 <Input {...field} isRequired={true} value={field.value || ''} />
-                                                                <FormErrorMessage>{form.errors.last_name}</FormErrorMessage>
+                                                                <FormErrorMessage css={secondaryText}>{form.errors.last_name}</FormErrorMessage>
                                                             </FormControl>
                                                         )}
                                                     </Field>
@@ -145,7 +162,7 @@ const EditContact = (props: Props) => {
                                                 <GridItem colSpan={{ base: 1, md: 3 }}>
                                                     {/* Phone number input */}
                                                     <FormControl isReadOnly>
-                                                        <FormLabel>Phone number</FormLabel>
+                                                        <FormLabel css={primaryText}>Phone number</FormLabel>
                                                         {contact?.phones.map((phone, index) => (
                                                             <div key={index}>
                                                                 <HStack>
@@ -177,7 +194,7 @@ const EditContact = (props: Props) => {
                                                                                     <>
                                                                                         {/* Edit current phone number input */}
                                                                                         <FormControl isRequired>
-                                                                                            <FormLabel>Phone Number</FormLabel>
+                                                                                            <FormLabel css={primaryText}>Phone Number</FormLabel>
                                                                                             <PhoneInput
                                                                                                 country="in"
                                                                                                 placeholder="Enter phone number"
@@ -196,6 +213,7 @@ const EditContact = (props: Props) => {
                                                                                         </FormControl>
                                                                                         <ButtonGroup mt={2} display='flex' justifyContent='flex-end'>
                                                                                             <Button
+                                                                                                css={buttonStyle}
                                                                                                 type='button'
                                                                                                 size={'sm'}
                                                                                                 colorScheme='whatsapp'
@@ -253,12 +271,12 @@ const EditContact = (props: Props) => {
                                             </Grid>
                                             <Flex mt={10}>
                                                 <Link to='/'>
-                                                    <Button leftIcon={<GoArrowLeft />} colorScheme='red' variant='ghost'>
+                                                    <Button css={buttonStyle} leftIcon={<GoArrowLeft />} colorScheme='red' variant='ghost'>
                                                         Contact list
                                                     </Button>
                                                 </Link>
                                                 <Spacer />
-                                                <Button isLoading={loading} leftIcon={<GoCheck />} type='submit' colorScheme='whatsapp' >
+                                                <Button css={buttonStyle} isLoading={loading} leftIcon={<GoCheck />} type='submit' colorScheme='whatsapp' >
                                                     Update
                                                 </Button>
                                             </Flex>
